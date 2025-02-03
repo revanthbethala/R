@@ -13,6 +13,10 @@ const AssessmentForm = lazy(() => import("./myComponents/AssesmentForm"));
 import Certificate from "./myComponents/Certificate";
 import MockInterviewForm from "./myComponents/MockInterviewForm";
 import MockInterviewInstructions from "./myComponents/MockInterviewInstructions";
+import CoursesCatalog from "./myComponents/CourseCard";
+import CourseDetailsPage from "./myComponents/CourseDetails";
+import CourseDetails from "./myComponents/CourseDetails";
+import CourseCard from "./myComponents/CourseCard";
 const Home = lazy(() => import("./pages/Home"));
 const Assesment = lazy(() => import("./pages/Assesment"));
 const Courses = lazy(() => import("./pages/Courses"));
@@ -33,7 +37,15 @@ function App() {
 
         {
           path: "courses",
-          element: <ProtectedRoute></ProtectedRoute>,
+          element: (
+            <ProtectedRoute>
+              <CourseCard />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "course-detail/:id",
+          element: <CourseDetails />,
         },
         {
           path: "tests",

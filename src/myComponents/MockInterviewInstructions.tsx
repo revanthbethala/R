@@ -9,7 +9,7 @@ function MockInterviewInstructions() {
   const { formData } = useInterviewStore();
   const { interviewType, role, experience, numberOfQuestions } = formData;
   return (
-    <div className=" h-[85.7vh] grid md:grid-cols-2 grid-cols-1  w-full items-center justify-center p-6">
+    <div className=" h-screen grid md:grid-cols-2 grid-cols-1  w-full items-center justify-center p-6">
       <div className="font-semibold font-Inter text-lg space-y-5 bg-white p-5 rounded-xl bg-opacity-70">
       <h2 className="font-extrabold text-center text-2xl pb-5 tracking-wide font-Inter">Interview Instructions</h2>
         <h3>

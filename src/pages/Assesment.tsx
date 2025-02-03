@@ -183,4 +183,3 @@ function ShowResults({ score, totalQuestions }) {
     </div>
   );
 }
-}

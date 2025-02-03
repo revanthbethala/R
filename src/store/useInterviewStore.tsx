@@ -20,12 +20,11 @@ interface InterviewStore {
   setFormData: (field: keyof FormData, value: string | number) => void;
   setError: (field: keyof Errors, message: string) => void;
   resetErrors: () => void;
-  answer: string;
-  setAnswer: (newAnswer: string) => void;
-  appendAnswer: (text: string) => void;
+  score: number;
+  updateScore: (newScore: number) => void;
 }
 export const useInterviewStore = create<InterviewStore>((set) => ({
-  answer: "",
+  score: 0,
   formData: {
     role: "Python Developer",
     interviewType: "Technical",
@@ -55,6 +54,5 @@ export const useInterviewStore = create<InterviewStore>((set) => ({
         numberOfQuestions: "",
       },
     })),
-  setAnswer: (newAnswer) => set({ answer: newAnswer }),
-  appendAnswer: (text) => set((state) => ({ answer: state.answer + text })),
+  updateScore: (score) => set({ score }),
 }));

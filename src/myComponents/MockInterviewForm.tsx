@@ -49,7 +49,8 @@ export default function MockInterviewForm() {
   };
 
   return (
-    <div className="flex items-center justify-center p-2 md:p-0">
+    <div className="">
+    <div className="flex items-center justify-center p-2 md:p-0 h-full">
       <motion.div
         initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -167,6 +168,7 @@ export default function MockInterviewForm() {
           </form>
         </div>
       </motion.div>
+    </div>
     </div>
   );
 }

@@ -62,7 +62,7 @@ function AssessmentForm() {
   };
 
   return (
-    <div className="flex items-center justify-center p-2">
+    <div className="flex items-center justify-center p-2 ">
       <motion.div
         initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}

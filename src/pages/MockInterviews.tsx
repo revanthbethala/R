@@ -5,9 +5,10 @@ import { useInterviewStore } from "@/store/useInterviewStore";
 import useSpeechToText from "react-hook-speech-to-text";
 import Webcam from "react-webcam";
 import Loading from "./Loading";
+import { NavLink } from "react-router";
 
 function GenerateQuestions() {
-  const { formData } = useInterviewStore();
+  const { formData,updateScore } = useInterviewStore();
   const { role, interviewType, numberOfQuestions, experience } = formData;
 
   const prompt = `Generate a list of ${numberOfQuestions} ${interviewType} questions for a ${experience} applying for the role of ${role}. The questions should cover all the topics related to ${role}. Format the response as { "questions": ["Q1", "Q2", "Q3", "Q4"] }`;
@@ -27,11 +28,11 @@ function GenerateQuestions() {
   const [localAnswers, setLocalAnswers] = useState([]); // Manage answers locally
   const [isCompleted, setIsCompleted] = useState(false); // Track if interview is completed
 
-  const { appendAnswer } = useInterviewStore();
 
   useEffect(() => {
     if (results.length > 0) {
       const latestAnswer = results[results.length - 1]?.transcript;
+      console.log(latestAnswer);
       if (latestAnswer) {
         // Store the answer with the corresponding question
         setLocalAnswers((prevAnswers) => {
@@ -39,10 +40,9 @@ function GenerateQuestions() {
           newAnswers[currentQuestionIndex] = latestAnswer; // Update the answer for the current question
           return newAnswers;
         });
-        appendAnswer(latestAnswer); // Append answer to the store if needed
       }
     }
-  }, [results, currentQuestionIndex, appendAnswer]);
+  }, [results, currentQuestionIndex]);
 
   if (isLoading) return <Loading />;
   if (error) return <p className="font-semibold text-red-600">{error}</p>;
@@ -69,7 +69,7 @@ function GenerateQuestions() {
     return <p>Web Speech API is not available in this browser 🤷‍</p>;
 
   return (
-    <div className="h-[86vh] overflow-hidden">
+    <div className="h-screen overflow-hidden">
       {!isCompleted ? (
         <div className="grid grid-cols-2 p-4 items-center ">
           <div className="flex flex-col gap-2 items-start bg-white bg-opacity-40 p-4 rounded-lg ">
@@ -115,7 +115,11 @@ function GenerateQuestions() {
         </div>
       ) : (
         <div className="flex items-center justify-center flex-col">
-          <ShowResults questions={questions} answers={localAnswers} />
+          <ShowResults
+            questions={questions}
+            // updateScore={updateScore}
+            answers={localAnswers}
+          />
         </div>
       )}
     </div>
@@ -152,9 +156,9 @@ function ShowResults({ answers, questions }) {
   const exampleFormat = `{
     overallPerformance:"Satisfactory","Unsatisfactory",
     overallAssessment:"need to improve at specific field or everything is good"
-    areaOfImprovement:"give improvement suggestions in 3-4lines"
+    areaOfImprovement:"give improvement suggestions in 3-4lines",
+    score:"give overall score as percentage based on the user responses"
   }`;
-
   let prompt = "";
   for (let i = 0; i < questions.length; i++) {
     prompt += `${questions[i]}: ${answers[i] || "Not Answered"}\n`;
@@ -164,9 +168,10 @@ function ShowResults({ answers, questions }) {
   const { data, isLoading, error } = useGemini(prompt);
   if (isLoading) return <Loading />;
   if (error) return <p className="font-semibold text-red-600">{error}</p>;
-  let performance: string = data?.overallPerformance
+  let performance: string = data?.overallPerformance;
   performance = performance.toLowerCase();
-  console.log(performance);
+  // if (data?.score) updateScore(data?.score);
+  console.log(data?.score);
 
   return (
     <div className="mt-6 p-6 bg-blue-50 border border-blue-300 rounded-2xl shadow-lg  w-1/2">
@@ -175,8 +180,11 @@ function ShowResults({ answers, questions }) {
       </h2>
       {data ? (
         <div className="mt-4 space-y-2">
-          <p className="text-lg ">
-            <span className="font-medium">Your Performance:</span>{" "}
+          <p
+            className="text-lg space-x-3
+              "
+          >
+            <span className="font-medium">You Scored:</span>
             <span
               className={`${
                 performance == "unsatisfactory"
@@ -184,7 +192,18 @@ function ShowResults({ answers, questions }) {
                   : "text-green-700"
               }`}
             >
-              {" "}
+              {data?.score || "N/A"}
+            </span>
+          </p>
+          <p className="text-lg ">
+            <span className="font-medium">Your Performance:</span>
+            <span
+              className={`${
+                performance == "unsatisfactory"
+                  ? "text-red-700"
+                  : "text-green-700"
+              }`}
+            >
               {data?.overallPerformance || "N/A"}
             </span>
           </p>
@@ -193,13 +212,17 @@ function ShowResults({ answers, questions }) {
             {data?.overallAssessment || "N/A"}
           </p>
           <p className="text-lg ">
-            <span className="font-medium">Your Assessment:</span>{" "}
+            <span className="font-medium">Area of Improvement:</span>{" "}
             {data?.areaOfImprovement || "N/A"}
           </p>
 
           <div className="flex gap-2 items-center justify-center p-3">
-            <button className="my-btn text-center">Go To Home</button>
-            <button className="my-btn text-center">Retake Test</button>
+            <NavLink to="/" className="my-btn text-center">
+              Go To Home
+            </NavLink>
+            <NavLink to="/mockinterview" className="my-btn text-center">
+              Retake Test
+            </NavLink>
           </div>
         </div>
       ) : (

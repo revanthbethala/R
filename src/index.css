@@ -8,9 +8,7 @@
 .li-style {
   @apply font-semibold text-lg font-Inter cursor-pointer hover:bg-blue-700 rounded-lg hover:text-white p-2;
 }
-.body {
-  @apply bg-gradient-to-bl from-blue-200 via-sky-200 to-gray-200 bg-no-repeat bg-cover;
-}
+
 .card-style {
   @apply space-y-4 flex flex-col items-center justify-center  pb-3 pt-7 px-4 rounded-lg  border-gray-50 border-2 bg-white shadow-lg font-Lora;
 }
