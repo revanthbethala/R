@@ -1,4 +1,3 @@
-import RichTextEditor from "@/components/RichTextEditor";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -18,19 +17,55 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  useEditCourseMutation,
-  useGetCourseByIdQuery,
-  usePublishCourseMutation,
-} from "@/features/api/courseApi";
+import RichTextEditor from "@/myComponents/RichTextEditor";
 import { Loader2 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 
+// Define types for the course input state
+interface CourseInput {
+  courseTitle: string;
+  subTitle: string;
+  description: string;
+  category: string;
+  courseLevel: string;
+  coursePrice: string;
+  courseThumbnail: File | string;
+}
+
+// Define mock functions with appropriate types
+const mockEditCourse = async (
+  courseId: string,
+  input: CourseInput
+): Promise<{ message: string }> => {
+  // Simulate a successful course update response
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({ message: "Course updated successfully!" });
+    }, 1000);
+  });
+};
+
+const mockPublishCourse = async (
+  courseId: string,
+  action: "true" | "false"
+): Promise<{ data: { message: string } }> => {
+  // Simulate a publish/unpublish action
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        data: {
+          message:
+            action === "true" ? "Course published!" : "Course unpublished!",
+        },
+      });
+    }, 1000);
+  });
+};
+
 const CourseTab = () => {
-  
-  const [input, setInput] = useState({
+  const [input, setInput] = useState<CourseInput>({
     courseTitle: "",
     subTitle: "",
     description: "",
@@ -41,91 +76,69 @@ const CourseTab = () => {
   });
 
   const params = useParams();
-  const courseId = params.courseId;
-  const { data: courseByIdData, isLoading: courseByIdLoading , refetch} =
-    useGetCourseByIdQuery(courseId);
+  const courseId = params.courseId as string; // Explicit type for courseId
 
-    const [publishCourse, {}] = usePublishCourseMutation();
- 
-  useEffect(() => {
-    if (courseByIdData?.course) { 
-        const course = courseByIdData?.course;
-      setInput({
-        courseTitle: course.courseTitle,
-        subTitle: course.subTitle,
-        description: course.description,
-        category: course.category,
-        courseLevel: course.courseLevel,
-        coursePrice: course.coursePrice,
-        courseThumbnail: "",
-      });
-    }
-  }, [courseByIdData]);
+  // Mocked response for course data fetching
+  const courseByIdData = {
+    course: {
+      courseTitle: "Fullstack Developer",
+      subTitle: "Learn Fullstack Development",
+      description: "Comprehensive course on Fullstack Development.",
+      category: "Fullstack Development",
+      courseLevel: "Beginner",
+      coursePrice: "1999",
+      courseThumbnail: "",
+      isPublished: false,
+      lectures: [], // Empty lectures for demo
+    },
+  };
 
-  const [previewThumbnail, setPreviewThumbnail] = useState("");
+  const [previewThumbnail, setPreviewThumbnail] = useState<string>("");
   const navigate = useNavigate();
 
-  const [editCourse, { data, isLoading, isSuccess, error }] =
-    useEditCourseMutation();
-
-  const changeEventHandler = (e) => {
+  const changeEventHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setInput({ ...input, [name]: value });
   };
 
-  const selectCategory = (value) => {
+  const selectCategory = (value: string) => {
     setInput({ ...input, category: value });
   };
-  const selectCourseLevel = (value) => {
+
+  const selectCourseLevel = (value: string) => {
     setInput({ ...input, courseLevel: value });
   };
-  // get file
-  const selectThumbnail = (e) => {
+
+  // Handle file selection (thumbnail)
+  const selectThumbnail = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setInput({ ...input, courseThumbnail: file });
       const fileReader = new FileReader();
-      fileReader.onloadend = () => setPreviewThumbnail(fileReader.result);
+      fileReader.onloadend = () =>
+        setPreviewThumbnail(fileReader.result as string);
       fileReader.readAsDataURL(file);
     }
   };
 
+  // Mocked function for course update
   const updateCourseHandler = async () => {
-    const formData = new FormData();
-    formData.append("courseTitle", input.courseTitle);
-    formData.append("subTitle", input.subTitle);
-    formData.append("description", input.description);
-    formData.append("category", input.category);
-    formData.append("courseLevel", input.courseLevel);
-    formData.append("coursePrice", input.coursePrice);
-    formData.append("courseThumbnail", input.courseThumbnail);
-
-    await editCourse({ formData, courseId });
+    const response = await mockEditCourse(courseId, input);
+    toast.success(response.message);
   };
 
-  const publishStatusHandler = async (action) => {
+  // Mocked function for course publish/unpublish
+  const publishStatusHandler = async (action: "true" | "false") => {
     try {
-      const response = await publishCourse({courseId, query:action});
-      if(response.data){
-        refetch();
-        toast.success(response.data.message);
-      }
+      const response = await mockPublishCourse(courseId, action);
+      toast.success(response.data.message);
     } catch (error) {
       toast.error("Failed to publish or unpublish course");
     }
-  }
+  };
 
-  useEffect(() => {
-    if (isSuccess) {
-      toast.success(data.message || "Course update.");
-    }
-    if (error) {
-      toast.error(error.data.message || "Failed to update course");
-    }
-  }, [isSuccess, error]);
+  if (!courseByIdData?.course) return <h1>Loading...</h1>;
 
-  if(courseByIdLoading) return <h1>Loading...</h1>
- 
   return (
     <Card>
       <CardHeader className="flex flex-row justify-between">
@@ -136,7 +149,15 @@ const CourseTab = () => {
           </CardDescription>
         </div>
         <div className="space-x-2">
-          <Button disabled={courseByIdData?.course.lectures.length === 0} variant="outline" onClick={()=> publishStatusHandler(courseByIdData?.course.isPublished ? "false" : "true")}>
+          <Button
+            disabled={courseByIdData?.course.lectures.length === 0}
+            variant="outline"
+            onClick={() =>
+              publishStatusHandler(
+                courseByIdData?.course.isPublished ? "false" : "true"
+              )
+            }
+          >
             {courseByIdData?.course.isPublished ? "Unpublished" : "Publish"}
           </Button>
           <Button>Remove Course</Button>
@@ -252,15 +273,9 @@ const CourseTab = () => {
             <Button onClick={() => navigate("/admin/course")} variant="outline">
               Cancel
             </Button>
-            <Button disabled={isLoading} onClick={updateCourseHandler}>
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Please wait
-                </>
-              ) : (
-                "Save"
-              )}
+            <Button disabled={false} onClick={updateCourseHandler}>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Save
             </Button>
           </div>
         </div>

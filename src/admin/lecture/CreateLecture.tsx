@@ -1,15 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  useCreateLectureMutation,
-  useGetCourseLectureQuery,
-} from "@/features/api/courseApi";
-import { Loader2 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import  {  useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import Lecture from "./Lecture";
+
+// Mocked data
+const mockLectureData = [
+  { _id: "1", title: "Lecture 1" },
+  { _id: "2", title: "Lecture 2" },
+  { _id: "3", title: "Lecture 3" },
+];
 
 const CreateLecture = () => {
   const [lectureTitle, setLectureTitle] = useState("");
@@ -17,30 +19,12 @@ const CreateLecture = () => {
   const courseId = params.courseId;
   const navigate = useNavigate();
 
-  const [createLecture, { data, isLoading, isSuccess, error }] =
-    useCreateLectureMutation();
-
-  const {
-    data: lectureData,
-    isLoading: lectureLoading,
-    isError: lectureError,
-    refetch,
-  } = useGetCourseLectureQuery(courseId);
-
-  const createLectureHandler = async () => {
-    await createLecture({ lectureTitle, courseId });
+  // Mocked function for creating lecture
+  const createLectureHandler = () => {
+    toast.success("Lecture created successfully");
+    // Add mock lecture to the list
+    mockLectureData.push({ _id: new Date().toString(), title: lectureTitle });
   };
-
-  useEffect(() => {
-    if (isSuccess) {
-      refetch();
-      toast.success(data.message);
-    }
-    if (error) {
-      toast.error(error.data.message);
-    }
-  }, [isSuccess, error]);
-
 
   return (
     <div className="flex-1 mx-10">
@@ -70,26 +54,13 @@ const CreateLecture = () => {
           >
             Back to course
           </Button>
-          <Button disabled={isLoading} onClick={createLectureHandler}>
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Please wait
-              </>
-            ) : (
-              "Create lecture"
-            )}
-          </Button>
+          <Button onClick={createLectureHandler}>Create lecture</Button>
         </div>
         <div className="mt-10">
-          {lectureLoading ? (
-            <p>Loading lectures...</p>
-          ) : lectureError ? (
-            <p>Failed to load lectures.</p>
-          ) : lectureData.lectures.length === 0 ? (
-            <p>No lectures availabe</p>
+          {mockLectureData.length === 0 ? (
+            <p>No lectures available</p>
           ) : (
-            lectureData.lectures.map((lecture, index) => (
+            mockLectureData.map((lecture, index) => (
               <Lecture
                 key={lecture._id}
                 lecture={lecture}

@@ -1,5 +1,4 @@
 import { ChartNoAxesColumn, SquareLibrary } from "lucide-react";
-import React from "react";
 import { Link, Outlet } from "react-router-dom";
 
 const Sidebar = () => {
@@ -17,8 +16,8 @@ const Sidebar = () => {
           </Link>
         </div>
       </div>
-    <div className="flex-1 p-10 ">
-        <Outlet/>
+      <div className="flex-1 p-10 ">
+        <Outlet />
       </div>
     </div>
   );

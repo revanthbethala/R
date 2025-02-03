@@ -1,44 +1,65 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Filter from "./Filter";
 import SearchResult from "./SearchResult";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Link, useSearchParams } from "react-router-dom";
 import { AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link, useSearchParams } from "react-router-dom";
+
+// Static data for courses
+const courses = [
+  {
+    _id: "1",
+    courseTitle: "React for Beginners",
+    coursePrice: "$100.00",
+    isPublished: true,
+  },
+  {
+    _id: "2",
+    courseTitle: "Advanced JavaScript",
+    coursePrice: "$150.00",
+    isPublished: false,
+  },
+  {
+    _id: "3",
+    courseTitle: "Web Development Bootcamp",
+    coursePrice: "$200.00",
+    isPublished: true,
+  },
+  {
+    _id: "4",
+    courseTitle: "Introduction to Python",
+    coursePrice: "$120.00",
+    isPublished: false,
+  },
+];
 
 const SearchPage = () => {
   const [searchParams] = useSearchParams();
   const query = searchParams.get("query");
   const [selectedCategories, setSelectedCatgories] = useState([]);
   const [sortByPrice, setSortByPrice] = useState("");
-  const [courses, setCourses] = useState([]); // State for courses
-  const [isLoading, setIsLoading] = useState(false); // State for loading
-  const [isEmpty, setIsEmpty] = useState(false); // State for empty courses
 
-  // Simulate data fetching and loading state (remove if you implement actual API)
-  const fetchCourses = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      // Simulating fetched data
-      const fetchedData = []; // Replace with your actual data fetching logic
-      setCourses(fetchedData);
-      setIsLoading(false);
-      setIsEmpty(fetchedData.length === 0);
-    }, 1000);
-  };
+  // Simulating loading state
+  const isLoading = false;
+
+  const filteredCourses = courses.filter((course) =>
+    course.courseTitle.toLowerCase().includes(query?.toLowerCase() || "")
+  );
+
+  const isEmpty = filteredCourses.length === 0;
 
   const handleFilterChange = (categories, price) => {
     setSelectedCatgories(categories);
     setSortByPrice(price);
-    fetchCourses(); // Trigger data fetching on filter change
   };
 
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-8">
       <div className="my-6">
-        <h1 className="font-bold text-xl md:text-2xl">result for "{query}"</h1>
+        <h1 className="font-bold text-xl md:text-2xl">Results for "{query}"</h1>
         <p>
-          Showing results for{""}
+          Showing results for{" "}
           <span className="text-blue-800 font-bold italic">{query}</span>
         </p>
       </div>
@@ -52,7 +73,9 @@ const SearchPage = () => {
           ) : isEmpty ? (
             <CourseNotFound />
           ) : (
-            courses.map((course) => <SearchResult key={course._id} course={course} />)
+            filteredCourses.map((course) => (
+              <SearchResult key={course._id} course={course} />
+            ))
           )}
         </div>
       </div>

@@ -10,14 +10,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Switch } from "@/components/ui/switch";
-import { useEditLectureMutation, useGetLectureByIdQuery, useRemoveLectureMutation } from "@/features/api/courseApi";
-import axios from "axios";
-import { Loader2 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 
-const MEDIA_API = "http://localhost:8080/api/v1/media";
+// Mocked data for testing
+const mockLectureData = {
+  lectureTitle: "Introduction to React",
+  isPreviewFree: true,
+  videoInfo: {
+    videoUrl: "http://mockvideo.com",
+    publicId: "mockid123",
+  },
+};
 
 const LectureTab = () => {
   const [lectureTitle, setLectureTitle] = useState("");
@@ -29,82 +34,54 @@ const LectureTab = () => {
   const params = useParams();
   const { courseId, lectureId } = params;
 
-  const {data:lectureData} = useGetLectureByIdQuery(lectureId);
-  const lecture = lectureData?.lecture;
+  // Using mock data to simulate lecture retrieval
+  const lecture = mockLectureData;
 
-  useEffect(()=>{
-    if(lecture){
+  useEffect(() => {
+    if (lecture) {
       setLectureTitle(lecture.lectureTitle);
       setIsFree(lecture.isPreviewFree);
-      setUploadVideoInfo(lecture.videoInfo)
+      setUploadVideoInfo(lecture.videoInfo);
     }
-  },[lecture])
+  }, [lecture]);
 
-  const [edtiLecture, { data, isLoading, error, isSuccess }] =
-    useEditLectureMutation();
-    const [removeLecture,{data:removeData, isLoading:removeLoading, isSuccess:removeSuccess}] = useRemoveLectureMutation();
-
+  // Mock function for file upload
   const fileChangeHandler = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const formData = new FormData();
-      formData.append("file", file);
       setMediaProgress(true);
       try {
-        const res = await axios.post(`${MEDIA_API}/upload-video`, formData, {
-          onUploadProgress: ({ loaded, total }) => {
-            setUploadProgress(Math.round((loaded * 100) / total));
-          },
+        // Simulating video upload
+        setUploadVideoInfo({
+          videoUrl: "http://mockvideo.com/uploaded",
+          publicId: "mockid456",
         });
-
-        if (res.data.success) {
-       
-          setUploadVideoInfo({
-            videoUrl: res.data.data.url,
-            publicId: res.data.data.public_id,
-          });
-          setBtnDisable(false);
-          toast.success(res.data.message);
-        }
+        setBtnDisable(false);
+        toast.success("Video uploaded successfully");
       } catch (error) {
         console.log(error);
-        toast.error("video upload failed");
+        toast.error("Video upload failed");
       } finally {
         setMediaProgress(false);
       }
     }
   };
 
+  // Mock function to simulate lecture update
   const editLectureHandler = async () => {
-  
-
-    await edtiLecture({
+    toast.success("Lecture updated successfully");
+    // Update lecture with the new title and video info
+    console.log({
       lectureTitle,
-      videoInfo:uploadVideInfo,
-      isPreviewFree:isFree,
-      courseId,
-      lectureId,
+      videoInfo: uploadVideInfo,
+      isPreviewFree: isFree,
     });
   };
 
+  // Mock function to simulate lecture removal
   const removeLectureHandler = async () => {
-    await removeLecture(lectureId);
-  }
-
-  useEffect(() => {
-    if (isSuccess) {
-      toast.success(data.message);
-    }
-    if (error) {
-      toast.error(error.data.message);
-    }
-  }, [isSuccess, error]);
-
-  useEffect(()=>{
-    if(removeSuccess){
-      toast.success(removeData.message);
-    }
-  },[removeSuccess])
+    toast.success("Lecture removed successfully");
+  };
 
   return (
     <Card>
@@ -116,13 +93,12 @@ const LectureTab = () => {
           </CardDescription>
         </div>
         <div className="flex items-center gap-2">
-          <Button disbaled={removeLoading} variant="destructive" onClick={removeLectureHandler}>
-            {
-              removeLoading ? <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
-              Please wait
-              </> : "Remove Lecture"
-            }
+          <Button
+            disabled={false}
+            variant="destructive"
+            onClick={removeLectureHandler}
+          >
+            Remove Lecture
           </Button>
         </div>
       </CardHeader>
@@ -149,7 +125,11 @@ const LectureTab = () => {
           />
         </div>
         <div className="flex items-center space-x-2 my-5">
-          <Switch checked={isFree} onCheckedChange={setIsFree} id="airplane-mode" />
+          <Switch
+            checked={isFree}
+            onCheckedChange={setIsFree}
+            id="airplane-mode"
+          />
           <Label htmlFor="airplane-mode">Is this video FREE</Label>
         </div>
 
@@ -161,14 +141,8 @@ const LectureTab = () => {
         )}
 
         <div className="mt-4">
-          <Button disabled={isLoading} onClick={editLectureHandler}>
-              {
-                isLoading ? <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
-                Please wait
-                </> : "Update Lecture"
-              }
-            
+          <Button disabled={btnDisable} onClick={editLectureHandler}>
+            Update Lecture
           </Button>
         </div>
       </CardContent>

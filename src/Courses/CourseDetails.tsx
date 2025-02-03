@@ -1,4 +1,3 @@
-import BuyCourseButton from "@/components/BuyCourseButton";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,23 +8,41 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { useGetCourseByIdQuery } from "@/features/api/courseApi";
-import { useGetCourseDetailWithStatusQuery } from "@/features/api/purchaseApi";
 import { BadgeInfo, Lock, PlayCircle } from "lucide-react";
-import React from "react";
 import ReactPlayer from "react-player";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router";
 
-const CourseDetail = () => {
+const CourseDetails = () => {
   const params = useParams();
   const courseId = params.courseId;
   const navigate = useNavigate();
 
-  const { data, isLoading, isError } = useGetCourseDetailWithStatusQuery(courseId);
-
-  // Handle loading and error states
-  if (isLoading) return <h1>Loading...</h1>;
-  if (isError || !data) return <h1>Failed to load course details</h1>;
+  // Hardcoded course data
+  const data = {
+    course: {
+      courseTitle: "Learn React from Scratch",
+      subTitle: "The ultimate React course for beginners and beyond",
+      description: "<p>This is a detailed description of the React course.</p>",
+      creator: {
+        name: "John Doe",
+      },
+      createdAt: "2025-01-01T12:00:00Z",
+      enrolledStudents: [1, 2, 3],
+      lectures: [
+        {
+          lectureTitle: "Introduction to React",
+          videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          isAccessible: true,
+        },
+        {
+          lectureTitle: "Advanced React Concepts",
+          videoUrl: "",
+          isAccessible: false,
+        },
+      ],
+    },
+    purchased: true,
+  };
 
   const { course, purchased } = data || {};
   const lectures = course?.lectures || [];
@@ -41,7 +58,9 @@ const CourseDetail = () => {
       {/* Course Header */}
       <div className="bg-[#2D2F31] text-white">
         <div className="max-w-7xl mx-auto py-8 px-4 md:px-8 flex flex-col gap-2">
-          <h1 className="font-bold text-2xl md:text-3xl">{course?.courseTitle}</h1>
+          <h1 className="font-bold text-2xl md:text-3xl">
+            {course?.courseTitle}
+          </h1>
           <p className="text-base md:text-lg">{course?.subTitle}</p>
           <p>
             Created By{" "}
@@ -114,7 +133,7 @@ const CourseDetail = () => {
                   Continue Course
                 </Button>
               ) : (
-                <BuyCourseButton courseId={courseId} />
+                <button>Buy Course</button>
               )}
             </CardFooter>
           </Card>
@@ -124,4 +143,4 @@ const CourseDetail = () => {
   );
 };
 
-export default CourseDetail;
+export default CourseDetails;

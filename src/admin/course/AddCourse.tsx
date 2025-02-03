@@ -10,18 +10,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useCreateCourseMutation } from "@/features/api/courseApi";
 import { Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+
+// Mock function for course creation
+const mockCreateCourse = async (courseDetails) => {
+  // Simulate a successful course creation API response
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({ message: "Course created successfully!" });
+    }, 1000);
+  });
+};
 
 const AddCourse = () => {
   const [courseTitle, setCourseTitle] = useState("");
   const [category, setCategory] = useState("");
-
-  const [createCourse, { data, isLoading, error, isSuccess }] =
-    useCreateCourseMutation();
 
   const navigate = useNavigate();
 
@@ -30,22 +36,28 @@ const AddCourse = () => {
   };
 
   const createCourseHandler = async () => {
-    await createCourse({ courseTitle, category });
+    // Simulate course creation
+    const response = await mockCreateCourse({ courseTitle, category });
+    toast.success(response.message);
+    navigate("/admin/course"); // Redirect to the course list page after creation
   };
 
-  // for displaying toast
-  useEffect(() => {
-    if (isSuccess) {
-      toast.success(data?.message || "Course created.");
-      navigate("/admin/course");
-    }
-  }, [isSuccess, error, data?.message])
+  // Uncomment for actual API integration
+  // const [createCourse, { data, isLoading, error, isSuccess }] =
+  //   useCreateCourseMutation();
+
+  // useEffect(() => {
+  //   if (isSuccess) {
+  //     toast.success(data?.message || "Course created.");
+  //     navigate("/admin/course");
+  //   }
+  // }, [isSuccess, error, data?.message]);
 
   return (
     <div className="flex-1 mx-10">
       <div className="mb-4">
         <h1 className="font-bold text-xl">
-          Lets add course, add some basic course details for your new course
+          Let's add a course, provide some basic details for your new course
         </h1>
         <p className="text-sm">
           Lorem, ipsum dolor sit amet consectetur adipisicing elit. Possimus,
@@ -95,15 +107,9 @@ const AddCourse = () => {
           <Button variant="outline" onClick={() => navigate("/admin/course")}>
             Back
           </Button>
-          <Button disabled={isLoading} onClick={createCourseHandler}>
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Please wait
-              </>
-            ) : (
-              "Create"
-            )}
+          <Button disabled={false} onClick={createCourseHandler}>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Create
           </Button>
         </div>
       </div>

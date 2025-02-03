@@ -13,13 +13,18 @@ const AssessmentForm = lazy(() => import("./myComponents/AssesmentForm"));
 import Certificate from "./myComponents/Certificate";
 import MockInterviewForm from "./myComponents/MockInterviewForm";
 import MockInterviewInstructions from "./myComponents/MockInterviewInstructions";
-import CoursesCatalog from "./myComponents/CourseCard";
-import CourseDetailsPage from "./myComponents/CourseDetails";
-import CourseDetails from "./myComponents/CourseDetails";
-import CourseCard from "./myComponents/CourseCard";
+import CourseDetails from "./Courses/CourseDetails";
+import Course from "./Courses/Course";
+import CourseProgress from "./Courses/CourseProgress";
+import MyLearning from "./Courses/MyLearning";
+import SearchPage from "./Courses/SearchPage";
+import Dashboard from "./pages/Dashboard";
+import CreateLecture from "./admin/lecture/CreateLecture";
+import EditLecture from "./admin/lecture/EditLecture";
+import AddCourse from "./admin/course/AddCourse";
+import EditCourse from "./admin/course/EditCourse";
 const Home = lazy(() => import("./pages/Home"));
 const Assesment = lazy(() => import("./pages/Assesment"));
-const Courses = lazy(() => import("./pages/Courses"));
 const MockInterviews = lazy(() => import("./pages/MockInterviews"));
 const UserPreferences = lazy(() => import("./pages/UserPreferences"));
 const Jobs = lazy(() => import("./pages/Jobs"));
@@ -34,18 +39,71 @@ function App() {
           path: "/",
           element: <Home />,
         },
+        {
+          path: "my-learning",
+          element: (
+            <ProtectedRoute>
+              <MyLearning />
+            </ProtectedRoute>
+          ),
+        },
 
         {
           path: "courses",
           element: (
             <ProtectedRoute>
-              <CourseCard />
+              <Course />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "courses/search",
+          element: (
+            <ProtectedRoute>
+              <SearchPage />
             </ProtectedRoute>
           ),
         },
         {
           path: "course-detail/:id",
-          element: <CourseDetails />,
+          element: (
+            <ProtectedRoute>
+              <CourseDetails />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "course-progress/:courseId",
+          element: (
+            <ProtectedRoute>
+              <CourseProgress />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/admin",
+          children: [
+            {
+              path: "dashboard",
+              element: <Dashboard />,
+            },
+            {
+              path: "course/create",
+              element: <AddCourse />,
+            },
+            {
+              path: "course/:courseId",
+              element: <EditCourse />,
+            },
+            {
+              path: "course/:courseId/lecture",
+              element: <CreateLecture />,
+            },
+            {
+              path: "course/:courseId/lecture/:lectureId",
+              element: <EditLecture />,
+            },
+          ],
         },
         {
           path: "tests",
