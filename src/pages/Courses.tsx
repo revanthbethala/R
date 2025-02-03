@@ -1,11 +1,5 @@
-
 function Courses() {
-  return (
-    <div>
-    
-    
-    </div>
-  );
+  return <div></div>;
 }
 
 export default Courses;
