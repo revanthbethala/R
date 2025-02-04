@@ -112,7 +112,7 @@ const CourseTab = () => {
 
   // Handle file selection (thumbnail)
   const selectThumbnail = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    const file = e.target?.files?.[0];
     if (file) {
       setInput((prev) => ({ ...prev, courseThumbnail: file }));
       const fileReader = new FileReader();
@@ -125,23 +125,34 @@ const CourseTab = () => {
 
   const updateCourseHandler = async () => {
     try {
+      const formData = new FormData();
+
+      formData.append("courseTitle", input.courseTitle);
+      formData.append("subTitle", input.subTitle);
+      formData.append("description", input.description);
+      formData.append("category", input.category);
+      formData.append("courseLevel", input.courseLevel);
+      formData.append("coursePrice", input.coursePrice);
+
+      if (input.courseThumbnail instanceof File) {
+        formData.append("courseThumbnail", input.courseThumbnail);
+      }
+
       const res = await axios.put(
         `http://localhost:8000/api/v1/courses/edit/${courseId}`,
-        JSON.stringify(input),
+        formData,
         {
           headers: {
-            "Content-Type": "application/json",
+            "Content-Type": "multipart/form-data",
           },
           withCredentials: true,
         }
       );
-      const id = res?.data?.course?._id;
 
-      console.log(res);
+      console.log("Course updated:", res.data);
     } catch (err) {
-      console.log("error", err);
+      console.error("Error updating course:", err);
     }
-    console.log(input);
   };
 
   const publishStatusHandler = async (action: "true" | "false") => {
