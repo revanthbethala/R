@@ -1,9 +1,9 @@
 import Mock from "../models/mockInterview.model.js";
 import User from "../models/user.model.js";
 
-export const storeMockResult = async (req, res) => {
+export const storeMockDetails = async (req, res) => {
   try {
-    const { userId, jobRole, interviewType, experience, noOfQuestions, marksObtained } = req.body;
+    const { userId, jobRole, interviewType, experience, noOfQuestions } = req.body;
     console.log(userId, jobRole)
     const user = await User.findById(userId);
     if (!user) {
@@ -28,6 +28,24 @@ export const storeMockResult = async (req, res) => {
   }
 };
 
+export const storeMockMarks = async(req,res)=>{
+  try {
+    const { userId, marksObtained, testId } = req.body;
+    const mock = await Mock.findByIdAndUpdate(testId, { marksObtained }, { new: true });
+    if (!mock) {
+      return res.status(404).json({ message: "Mock test not found" });
+    }
+    res.status(200).json({ message: "Mock test marks updated successfully", mock });
+    const user = await User.findByIdAndUpdate(userId, { $push: { marksObtained: marksObtained } }, { new: true });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json({ message: "User's marks updated successfully", user });
+  }
+  catch (error) {
+    res.status(500).json({ message: "Error updating mock test marks", error: error.message });
+  }
+}
 export const getUserMockTests = async (req, res) => {
   try {
     const { userId } = req.params;
