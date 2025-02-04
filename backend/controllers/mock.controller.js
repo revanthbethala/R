@@ -16,7 +16,6 @@ export const storeMockDetails = async (req, res) => {
       interviewType,
       experience,
       noOfQuestions,
-      marksObtained,
     });
 
     await newMock.save();
