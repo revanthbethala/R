@@ -1,5 +1,5 @@
 import express from "express";
-import { storeMockResult, getUserMockTests, storeMockDetails, storeMockMarks } from "../controllers/mock.controller.js";
+import { getUserMockTests, storeMockDetails, storeMockMarks } from "../controllers/mock.controller.js";
 
 const router = express.Router();
 

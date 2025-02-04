@@ -1,6 +1,9 @@
 import Course from "../models/course.model.js";
 import User from "../models/user.model.js";
 import  Lecture  from "../models/lecture.model.js";
+import getDataUri from "../utils/datauri.js";
+import cloudinary from "../utils/cloudinary.js";
+import fs from 'fs';
 
 export const createCourse = async (req, res) => {
   try {
@@ -25,11 +28,17 @@ export const editCourse = async (req, res) => {
   try {
     const { courseId } = req.params;
     const { courseTitle, subTitle, description, courseLevel, coursePrice, isPublished } = req.body;
-    const courseThumbnail = {
+    const course_image = {
               originalname: 'test-image.jpg',  // Name of the file
               buffer: fs.readFileSync('../backend/assets/test-image.jpg') // Read the file as a buffer
             };
     //console.log(courseId);
+    const fileUri = getDataUri(course_image);
+    //console.log(fileUri);
+    const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+    console.log(cloudResponse);
+    const courseThumbnail = cloudResponse.secure_url;
+    console.log(courseThumbnail);
     const updatedCourse = await Course.findByIdAndUpdate(
       courseId,
       { courseTitle, subTitle, description, courseLevel, coursePrice, courseThumbnail, isPublished },
