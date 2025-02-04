@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema(
   {
-    userId:{
+    userId: {
       type: String,
       required: true,
       unique: true,
@@ -28,35 +28,35 @@ const UserSchema = new mongoose.Schema(
       default: false,
     },
     resume: {
-      type: String, 
+      type: String,
       default: "",
     },
     role: {
       type: String,
-      enum: ["student", "admin"], 
+      enum: ["student", "admin"],
       default: "student",
     },
     courses: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Course", 
+        ref: "Course",
       },
     ],
     tests: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Test", 
+        ref: "Test",
       },
     ],
     mockInterviews: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Mock", 
+        ref: "Mock",
       },
     ],
-    company:{
-      type:mongoose.Schema.Types.ObjectId , 
-      ref:'Company'
+    company: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Company",
     },
   },
   { timestamps: true }

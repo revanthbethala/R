@@ -44,7 +44,7 @@ const CourseTable = () => {
   const navigate = useNavigate();
 
   return (
-    <div>
+    <div className="px-4 py-3">
       <Button onClick={() => navigate(`create`)}>Create a new course</Button>
       <Table>
         <TableCaption>A list of your recent courses.</TableCaption>

@@ -10,20 +10,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import GetUserId from "@/helperFunctions/GetUserId";
+import axios from "axios";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
-
-// Mock function for course creation
-const mockCreateCourse = async (courseDetails) => {
-  // Simulate a successful course creation API response
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({ message: "Course created successfully!" });
-    }, 1000);
-  });
-};
 
 const AddCourse = () => {
   const [courseTitle, setCourseTitle] = useState("");
@@ -31,38 +22,43 @@ const AddCourse = () => {
 
   const navigate = useNavigate();
 
-  const getSelectedCategory = (value) => {
+  const getSelectedCategory = (value: string) => {
     setCategory(value);
   };
 
-  const createCourseHandler = async () => {
-    // Simulate course creation
-    const response = await mockCreateCourse({ courseTitle, category });
-    toast.success(response.message);
-    navigate("/admin/course"); // Redirect to the course list page after creation
+  const userId = GetUserId();
+  const courseData = {
+    userId,
+    courseTitle,
+    category,
   };
-
-  // Uncomment for actual API integration
-  // const [createCourse, { data, isLoading, error, isSuccess }] =
-  //   useCreateCourseMutation();
-
-  // useEffect(() => {
-  //   if (isSuccess) {
-  //     toast.success(data?.message || "Course created.");
-  //     navigate("/admin/course");
-  //   }
-  // }, [isSuccess, error, data?.message]);
-
+  console.log(courseData);
+  const createCourseHandler = async () => {
+    try {
+      const res = await axios.post(
+        "http://localhost:8000/api/v1/courses/create",
+        JSON.stringify(courseData),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      const id = res?.data?.course?._id;
+      console.log(id);
+      navigate(`/course/${id}`);
+    } catch (err) {
+      console.log("error", err);
+    }
+  };
   return (
     <div className="flex-1 mx-10">
       <div className="mb-4">
         <h1 className="font-bold text-xl">
           Let's add a course, provide some basic details for your new course
         </h1>
-        <p className="text-sm">
-          Lorem, ipsum dolor sit amet consectetur adipisicing elit. Possimus,
-          laborum!
-        </p>
+        <p className="text-sm">Add your courses</p>
       </div>
       <div className="space-y-4">
         <div>
@@ -107,10 +103,7 @@ const AddCourse = () => {
           <Button variant="outline" onClick={() => navigate("/admin/course")}>
             Back
           </Button>
-          <Button disabled={false} onClick={createCourseHandler}>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Create
-          </Button>
+          <Button onClick={createCourseHandler}>Create</Button>
         </div>
       </div>
     </div>

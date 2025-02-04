@@ -7,12 +7,12 @@ const Resume = lazy(() => import("./pages/Resume"));
 const Login = lazy(() => import("./pages/Login"));
 const Signup = lazy(() => import("./pages/Signup"));
 import Certificate from "./myComponents/Certificate";
-import MockInterviewForm from "./myComponents/MockInterviewForm";
-import MockInterviewInstructions from "./myComponents/MockInterviewInstructions";
+import MockInterviewForm from "./MockInterviews/MockInterviewForm";
+import MockInterview from "./MockInterviews/MockInterview";
+import MockInterviewInstructions from "./MockInterviews/MockInterviewInstructions";
 import CourseDetails from "./Courses/CourseDetails";
 import Course from "./Courses/Course";
 import CourseProgress from "./Courses/CourseProgress";
-import SearchPage from "./Courses/SearchPage";
 import Dashboard from "./pages/Dashboard";
 import CreateLecture from "./admin/lecture/CreateLecture";
 import EditLecture from "./admin/lecture/EditLecture";
@@ -20,9 +20,10 @@ import AddCourse from "./admin/course/AddCourse";
 import EditCourse from "./admin/course/EditCourse";
 import AssessmentForm from "./Assesments/AssesmentForm";
 import AssesmentInstructions from "./Assesments/AssesmentInstructions";
+import CourseTab from "./admin/course/CourseTab";
+import CourseTable from "./Courses/CourseTable";
 const Home = lazy(() => import("./pages/Home"));
-const Assesment = lazy(() => import("./pages/Assesment"));
-const MockInterviews = lazy(() => import("./pages/MockInterviews"));
+const Assesment = lazy(() => import("./Assesments/Assesment"));
 const UserPreferences = lazy(() => import("./pages/UserPreferences"));
 const Jobs = lazy(() => import("./pages/Jobs"));
 const Compiler = lazy(() => import("./pages/Compiler"));
@@ -49,7 +50,7 @@ function App() {
           path: "courses/search",
           element: (
             <ProtectedRoute>
-              <SearchPage />
+              <CourseTab />
             </ProtectedRoute>
           ),
         },
@@ -62,14 +63,6 @@ function App() {
           ),
         },
         {
-          path: "/dashboard",
-          element: (
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          ),
-        },
-        {
           path: "course-progress/:courseId",
           element: (
             <ProtectedRoute>
@@ -78,96 +71,95 @@ function App() {
           ),
         },
         {
-          path: "/admin",
-          children: [
-            {
-              path: "dashboard",
-              element: <Dashboard />,
-            },
-            {
-              path: "course/create",
-              element: <AddCourse />,
-            },
-            {
-              path: "course/:courseId",
-              element: <EditCourse />,
-            },
-            {
-              path: "course/:courseId/lecture",
-              element: <CreateLecture />,
-            },
-            {
-              path: "course/:courseId/lecture/:lectureId",
-              element: <EditLecture />,
-            },
-          ],
-        },
-        {
-          path: "tests",
+          path: "dashboard",
           element: (
             <ProtectedRoute>
-              <AssessmentForm />
+              <Dashboard />
             </ProtectedRoute>
           ),
         },
         {
-          path: "tests/instructions",
-          element: (
-            <ProtectedRoute>
-              <AssesmentInstructions />
-            </ProtectedRoute>
-          ),
+          path: "course/create",
+          element: <AddCourse />,
         },
         {
-          path: "tests/start/:id",
-          element: (
-            <ProtectedRoute>
-              <Assesment />
-            </ProtectedRoute>
-          ),
+          path: "course/:courseId",
+          element: <EditCourse />,
         },
         {
-          path: "mockinterview",
-          element: (
-            <ProtectedRoute>
-              <MockInterviewForm />
-            </ProtectedRoute>
-          ),
+          path: "course/:courseId/lecture",
+          element: <CreateLecture />,
         },
         {
-          path: "mockinterview/instructions",
-          element: (
-            <ProtectedRoute>
-              <MockInterviewInstructions />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "mockinterview/start",
-          element: (
-            <ProtectedRoute>
-              <MockInterviews />
-            </ProtectedRoute>
-          ),
-        },
-
-        {
-          path: "jobs",
-          element: (
-            <ProtectedRoute>
-              <Jobs />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "compiler",
-          element: <Compiler />,
-        },
-        {
-          path: "resume-builder",
-          element: <Resume />,
+          path: "course/:courseId/lecture/:lectureId",
+          element: <EditLecture />,
         },
       ],
+    },
+    {
+      path: "tests",
+      element: (
+        <ProtectedRoute>
+          <AssessmentForm />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "tests/instructions",
+      element: (
+        <ProtectedRoute>
+          <AssesmentInstructions />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "tests/start/:id",
+      element: (
+        <ProtectedRoute>
+          <Assesment />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "mockinterview",
+      element: (
+        <ProtectedRoute>
+          <MockInterviewForm />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "mockinterview/instructions",
+      element: (
+        <ProtectedRoute>
+          <MockInterviewInstructions />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "mockinterview/start/:id",
+      element: (
+        <ProtectedRoute>
+          <MockInterview />
+        </ProtectedRoute>
+      ),
+    },
+
+    {
+      path: "jobs",
+      element: (
+        <ProtectedRoute>
+          <Jobs />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "compiler",
+      element: <Compiler />,
+    },
+    {
+      path: "resume-builder",
+      element: <Resume />,
     },
     {
       path: "/login",

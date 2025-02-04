@@ -20,7 +20,6 @@ export default function useGemini(content) {
         let text;
         try {
           text = res?.slice(7, res.length - 4);
-          console.log(text);
           text = JSON.parse(text);
           console.log("After Parsing", text);
         } catch (err) {
@@ -31,7 +30,6 @@ export default function useGemini(content) {
         setData(text);
       } catch (err) {
         console.log(err);
-
         setError("Something went wrong");
       } finally {
         setIsLoading(false);

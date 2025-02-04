@@ -1,15 +1,13 @@
 import useUserPreferencesStore from "@/store/useUserPreferencesStore";
 import { useAssessmentStore } from "@/store/useAssesmentStore";
 import useGemini from "@/myComponents/useGemini";
-import Loading from "./Loading";
+import Loading from "../pages/Loading";
 import { useState, useEffect } from "react";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
+import { useParams } from "react-router";
+import axios from "axios";
 import { useUser } from "@clerk/clerk-react";
-
 export default function Assessment() {
-  const { user } = useUser();
-  console.log(user);
-
   const { formData } = useAssessmentStore();
   const { category, difficulty, timeLimit, numberOfQuestions } = formData;
   const exampleFormat: string = `[{
@@ -132,7 +130,6 @@ export function Quiz({ quizData, timeLimit }) {
               </button>
             ))}
           </div>
-
           <div className="mt-6 text-center">
             <button
               onClick={handleNextQuestion}
@@ -143,17 +140,36 @@ export function Quiz({ quizData, timeLimit }) {
           </div>
         </div>
       ) : (
-        <ShowResults
-          score={score}
-          totalQuestions={quizData.length}
-          updateScore={updateScore}
-        />
+        <ShowResults score={score} totalQuestions={quizData.length} />
       )}
     </div>
   );
 }
-function ShowResults({ score, totalQuestions, updateScore }) {
+function ShowResults({ score, totalQuestions }) {
+  const navigate = useNavigate();
+  const { user } = useUser();
+  const userId = user?.id;
   const percentageObtained = (score / totalQuestions) * 100;
+  const { id } = useParams();
+  useEffect(() => {
+    async function PostTestScore() {
+      const res = await axios.put(
+        `http://localhost:8000/api/v1/tests/storeMarks/${id}`,
+        JSON.stringify({ marksObtained: percentageObtained, userId }),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      console.log("Form Submitted:", res?.data);
+      console.log(id);
+      navigate(`/tests/start/${id}`);
+    }
+    PostTestScore();
+  }, [id,percentageObtained,userId]);
+
   return (
     <div className="flex flex-col items-center justify-center ">
       <div className="bg-white bg-opacity-20 p-8">
