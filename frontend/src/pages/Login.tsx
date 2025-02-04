@@ -1,6 +1,5 @@
 import Logo from "@/myComponents/Logo";
 import { SignIn } from "@clerk/clerk-react";
-import React from "react";
 
 function Login() {
   return (

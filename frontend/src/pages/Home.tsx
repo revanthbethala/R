@@ -14,8 +14,40 @@ import {
 } from "lucide-react";
 import { NavLink } from "react-router";
 import { categories, hero, jobs, resume } from "../data";
+import { useUser } from "@clerk/clerk-react";
+import { useEffect } from "react";
 
+import axios from "axios";
 function Categories() {
+  const { user, isLoaded } = useUser();
+  const syncUserData = async () => {
+    if (user) {
+      try {
+        const userData = {
+          userId: user.id,
+          fullName: user.username,
+          email: user.primaryEmailAddress?.emailAddress,
+          profilePic: user.imageUrl,
+          isSignedIn: true,
+        };
+        console.log(userData);
+        await axios.post(
+          "http://localhost:8000/api/v1/user/getDetails",
+          userData
+        );
+
+        console.log("User data synced successfully!");
+      } catch (error) {
+        console.error("Error syncing user data:", error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (isLoaded && user) {
+      syncUserData();
+    }
+  }, [isLoaded, user]);
   return (
     <div className=" w-full ">
       {/* Hero Section */}

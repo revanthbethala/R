@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import RichTextEditor from "@/myComponents/RichTextEditor";
+import axios from "axios";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -113,21 +114,36 @@ const CourseTab = () => {
   const selectThumbnail = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setInput({ ...input, courseThumbnail: file });
+      setInput((prev) => ({ ...prev, courseThumbnail: file }));
       const fileReader = new FileReader();
       fileReader.onloadend = () =>
         setPreviewThumbnail(fileReader.result as string);
       fileReader.readAsDataURL(file);
     }
+    console.log("file is:", file);
   };
 
-  // Mocked function for course update
   const updateCourseHandler = async () => {
-    const response = await mockEditCourse(courseId, input);
-    toast.success(response.message);
+    try {
+      const res = await axios.put(
+        `http://localhost:8000/api/v1/courses/edit/${courseId}`,
+        JSON.stringify(input),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      const id = res?.data?.course?._id;
+
+      console.log(res);
+    } catch (err) {
+      console.log("error", err);
+    }
+    console.log(input);
   };
 
-  // Mocked function for course publish/unpublish
   const publishStatusHandler = async (action: "true" | "false") => {
     try {
       const response = await mockPublishCourse(courseId, action);
@@ -274,7 +290,6 @@ const CourseTab = () => {
               Cancel
             </Button>
             <Button disabled={false} onClick={updateCourseHandler}>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Save
             </Button>
           </div>

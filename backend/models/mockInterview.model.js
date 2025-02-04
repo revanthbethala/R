@@ -18,7 +18,7 @@ const mockSchema = new mongoose.Schema(
     },
     experience: {
       type: String, // Duration in minutes
-      enum:["Fresher","Senior"],
+      enum:["Fresher","Entry","Senior"],
       required: true,
     },
     noOfQuestions: {
@@ -28,7 +28,6 @@ const mockSchema = new mongoose.Schema(
     },
     marksObtained: {
       type: Number,
-      required: true,
     },
   },
   { timestamps: true }

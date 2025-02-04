@@ -11,7 +11,6 @@ function AssesmentInstructions() {
     difficulty: difficultyLevel,
     timeLimit: testDuration,
     numberOfQuestions: noOfQuestions,
-    isSubmitted,
   } = formData;
   const { user } = useUser();
   const userId = user?.id;
