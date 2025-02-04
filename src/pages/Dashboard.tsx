@@ -1,11 +1,11 @@
-import React from 'react'
+import MyLearning from "@/Courses/MyLearning";
 
 function Dashboard() {
   return (
     <div>
-      Dashboard
+      <MyLearning />
     </div>
-  )
+  );
 }
 
-export default Dashboard
+export default Dashboard;

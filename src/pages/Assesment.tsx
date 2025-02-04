@@ -4,8 +4,12 @@ import useGemini from "@/myComponents/useGemini";
 import Loading from "./Loading";
 import { useState, useEffect } from "react";
 import { NavLink } from "react-router";
+import { useUser } from "@clerk/clerk-react";
 
 export default function Assessment() {
+  const { user } = useUser();
+  console.log(user);
+
   const { formData } = useAssessmentStore();
   const { category, difficulty, timeLimit, numberOfQuestions } = formData;
   const exampleFormat: string = `[{
@@ -16,6 +20,7 @@ export default function Assessment() {
   const { study, experience, domain1, domain2 } = userForm;
 
   const content = `Generate ${numberOfQuestions} quiz questions in the ${category} category at the ${difficulty} level. The questions should be tailored for a person with ${study} and ${experience}, who is interested in ${domain1} and ${domain2}. Each question should be an object containing a question, four answer choices (A, B, C, and D), and a correctAnswer field indicating the correct option in this format ${exampleFormat}. Ensure clarity, accessibility, and suitability in the subject.`;
+  const { data, error, isLoading } = useGemini(content);
   if (
     !category ||
     !difficulty ||
@@ -24,10 +29,9 @@ export default function Assessment() {
     !experience ||
     !domain1 ||
     !domain2
-  ){
-    return
+  ) {
+    return;
   }
-    const { data, error, isLoading } = useGemini(content);
   if (isLoading) return <Loading />;
   if (error) return <p className="font-semibold text-red-600">{error}</p>;
 
@@ -139,12 +143,16 @@ export function Quiz({ quizData, timeLimit }) {
           </div>
         </div>
       ) : (
-        <ShowResults score={score} totalQuestions={quizData.length} />
+        <ShowResults
+          score={score}
+          totalQuestions={quizData.length}
+          updateScore={updateScore}
+        />
       )}
     </div>
   );
 }
-function ShowResults({ score, totalQuestions }) {
+function ShowResults({ score, totalQuestions, updateScore }) {
   const percentageObtained = (score / totalQuestions) * 100;
   return (
     <div className="flex flex-col items-center justify-center ">

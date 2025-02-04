@@ -4,7 +4,7 @@ import { create } from "zustand";
 interface FormData {
   category: string;
   difficulty: string;
-  timeLimit: string;
+  timeLimit: number;
   numberOfQuestions: number;
   isSubmitted: boolean;
 }
@@ -30,7 +30,7 @@ export const useAssessmentStore = create<AssessmentStore>((set) => ({
   formData: {
     category: "Web Development",
     difficulty: "Easy",
-    timeLimit: "10",
+    timeLimit: 10,
     numberOfQuestions: 10,
     isSubmitted: false,
   },
