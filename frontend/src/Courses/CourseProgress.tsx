@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import useGet from "@/myComponents/useGet";
 import { CheckCircle, CheckCircle2, CirclePlay } from "lucide-react";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
@@ -22,7 +23,8 @@ const CourseProgress = () => {
   const params = useParams<{ courseId: string }>(); // Type the params to include courseId
   const courseId = params.courseId;
 
-  // Sample course data
+  const {data,isLoading,error} = useGet(`courses/${courseId}/lectures`)
+  console.log(data);
   const courseData: CourseData = {
     courseTitle: "Learn React from Scratch",
     lectures: [

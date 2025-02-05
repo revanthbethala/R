@@ -5,10 +5,13 @@
 @tailwind components;
 @tailwind utilities;
 
+.my-bg {
+  @apply bg-gradient-to-tr from-blue-300 via-blue-100  to-blue-200;
+}
+
 .li-style {
   @apply font-semibold text-lg font-Inter cursor-pointer hover:bg-blue-700 rounded-lg hover:text-white p-2;
 }
-
 .card-style {
   @apply space-y-4 flex flex-col items-center justify-center  pb-3 pt-7 px-4 rounded-lg  border-gray-50 border-2 bg-white shadow-lg font-Lora;
 }

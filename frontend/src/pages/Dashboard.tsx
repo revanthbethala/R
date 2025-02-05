@@ -1,16 +1,24 @@
 import MyLearning from "@/Courses/MyLearning";
-import axios from "axios";
+import useGet from "@/myComponents/useGet";
 
 function Dashboard() {
-  const handleGetCourses = async () => {
-    const res = await axios.get(
-      `http://localhost:8000/api/v1/courses/published`
-    );
-    console.log(res.data);
+  const { data, isLoading, error } = useGet("courses/published");
+  console.log(data,isLoading,error);
+  const handleGetCourses = () => {
+    if (error) {
+      console.log(error);
+    }
+    if (isLoading) {
+      console.log("Loading...");
+    }
+    if (data) {
+      console.log(data);
+    }
   };
+
   return (
     <div>
-      {/* <MyLearning /> */}
+      <MyLearning />
       <button onClick={handleGetCourses}>get courses</button>
     </div>
   );
