@@ -11,11 +11,13 @@ import {
   removeLecture,
   getLectureById,
 } from "../controllers/course.controller.js";
+import { singleUpload } from "../middlewares/multer.js"
+
 
 const router = express.Router();
 
 router.route("/create").post(createCourse);
-router.route("/edit/:courseId").put(editCourse);
+router.route("/edit/:courseId").put(singleUpload,editCourse);
 router.route("/published").get(getPublishedCourses);
 router.route("/creator/:id").get(getCreatorCourses);
 router.route("/:courseId").get(getCourseById);

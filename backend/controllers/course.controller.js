@@ -36,8 +36,16 @@ export const editCourse = async (req, res) => {
       coursePrice,
       isPublished,
     } = req.body;
-    const courseThumbnail = req.file;
+
+    const file = req.file;
+
+    const fileUri = getDataUri(file);
+    console.log(fileUri);
+    const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+    console.log(cloudResponse);
+    const courseThumbnail = cloudResponse.secure_url;
     console.log(courseThumbnail);
+    
     const updatedCourse = await Course.findByIdAndUpdate(courseId, {
       courseTitle,
       subTitle,
