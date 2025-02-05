@@ -1,7 +1,7 @@
 import { Edit } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const Lecture = ({ lecture, courseId, index }) => {
+const Lecture = ({ courseId, index }) => {
   const navigate = useNavigate();
   const goToUpdateLecture = () => {
     navigate(`${lecture._id}`);

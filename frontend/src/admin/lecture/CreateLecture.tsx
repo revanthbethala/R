@@ -1,10 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import  {  useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useState } from "react";
+import { NavLink, useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import Lecture from "./Lecture";
+import axios from "axios";
+import { Edit } from "lucide-react";
 
 // Mocked data
 const mockLectureData = [
@@ -15,15 +17,28 @@ const mockLectureData = [
 
 const CreateLecture = () => {
   const [lectureTitle, setLectureTitle] = useState("");
-  const params = useParams();
-  const courseId = params.courseId;
+  const { courseId } = useParams();
   const navigate = useNavigate();
-
+  const [lectureId, setLectureId] = useState<string>("");
   // Mocked function for creating lecture
-  const createLectureHandler = () => {
-    toast.success("Lecture created successfully");
-    // Add mock lecture to the list
-    mockLectureData.push({ _id: new Date().toString(), title: lectureTitle });
+  const createLectureHandler = async () => {
+    try {
+      const res = await axios?.post(
+        `http://localhost:8000/api/v1/courses/${courseId}/lecture`,
+        JSON.stringify({ lectureTitle }),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      setLectureId(res?.data?.lecture?._id);
+
+      console.log(lectureId);
+    } catch (err) {
+      console.log("error", err);
+    }
   };
 
   return (
@@ -57,18 +72,9 @@ const CreateLecture = () => {
           <Button onClick={createLectureHandler}>Create lecture</Button>
         </div>
         <div className="mt-10">
-          {mockLectureData.length === 0 ? (
-            <p>No lectures available</p>
-          ) : (
-            mockLectureData.map((lecture, index) => (
-              <Lecture
-                key={lecture._id}
-                lecture={lecture}
-                courseId={courseId}
-                index={index}
-              />
-            ))
-          )}
+          <NavLink to={`/course/${courseId}/lecture/${lectureId}`}>
+            <Edit />
+          </NavLink>
         </div>
       </div>
     </div>

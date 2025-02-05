@@ -30,13 +30,10 @@ function Categories() {
           profilePic: user.imageUrl,
           isSignedIn: true,
         };
-        console.log(userData);
         await axios.post(
           "http://localhost:8000/api/v1/user/getDetails",
           userData
         );
-
-        console.log("User data synced successfully!");
       } catch (error) {
         console.error("Error syncing user data:", error);
       }
@@ -49,7 +46,7 @@ function Categories() {
     }
   }, [isLoaded, user]);
   return (
-    <div className=" w-full ">
+    <div className=" w-full my-bg">
       {/* Hero Section */}
       <div className="flex md:flex-row flex-col-reverse md:px-20 items-center h-[calc(100vh-5rem)] justify-between px-2">
         <div className="space-y-4 p-4 flex flex-col  md:items-start font-Inter md:w-1/2">

@@ -1,11 +1,25 @@
 import MyLearning from "@/Courses/MyLearning";
-import { Outlet } from "react-router";
+import useGet from "@/myComponents/useGet";
 
 function Dashboard() {
+  const { data, isLoading, error } = useGet("courses/published");
+  console.log(data,isLoading,error);
+  const handleGetCourses = () => {
+    if (error) {
+      console.log(error);
+    }
+    if (isLoading) {
+      console.log("Loading...");
+    }
+    if (data) {
+      console.log(data);
+    }
+  };
+
   return (
     <div>
       <MyLearning />
-      <Outlet />
+      <button onClick={handleGetCourses}>get courses</button>
     </div>
   );
 }

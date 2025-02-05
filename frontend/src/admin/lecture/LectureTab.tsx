@@ -10,79 +10,83 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Switch } from "@/components/ui/switch";
-import  { useEffect, useState } from "react";
+import axios from "axios";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { toast } from "sonner";
-
-// Mocked data for testing
-const mockLectureData = {
-  lectureTitle: "Introduction to React",
-  isPreviewFree: true,
-  videoInfo: {
-    videoUrl: "http://mockvideo.com",
-    publicId: "mockid123",
-  },
-};
 
 const LectureTab = () => {
   const [lectureTitle, setLectureTitle] = useState("");
-  const [uploadVideInfo, setUploadVideoInfo] = useState(null);
-  const [isFree, setIsFree] = useState(false);
+  const [video, setVideo] = useState(null);
+  const [isPreviewFree, setIsPreviewFree] = useState(false);
   const [mediaProgress, setMediaProgress] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [btnDisable, setBtnDisable] = useState(true);
-  const params = useParams();
-  const { courseId, lectureId } = params;
+  const { courseId, lectureId } = useParams();
 
-  // Using mock data to simulate lecture retrieval
-  const lecture = mockLectureData;
+  const handleFileChange = (event) => {
+    const selectedFile = event.target.files[0];
+    if (!selectedFile) return;
 
-  useEffect(() => {
-    if (lecture) {
-      setLectureTitle(lecture.lectureTitle);
-      setIsFree(lecture.isPreviewFree);
-      setUploadVideoInfo(lecture.videoInfo);
+    const allowedTypes = ["video/mp4", "video/webm", "video/ogg"];
+    if (!allowedTypes.includes(selectedFile.type)) {
+      alert("Invalid file type. Please upload an MP4, WebM, or OGG video.");
+      return;
     }
-  }, [lecture]);
 
-  // Mock function for file upload
-  const fileChangeHandler = async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setMediaProgress(true);
-      try {
-        // Simulating video upload
-        setUploadVideoInfo({
-          videoUrl: "http://mockvideo.com/uploaded",
-          publicId: "mockid456",
-        });
-        setBtnDisable(false);
-        toast.success("Video uploaded successfully");
-      } catch (error) {
-        console.log(error);
-        toast.error("Video upload failed");
-      } finally {
-        setMediaProgress(false);
+    if (selectedFile.size > 500 * 1024 * 1024) {
+      // 500MB limit
+      alert("File size exceeds the 500MB limit.");
+      return;
+    }
+
+    setVideo(selectedFile);
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!courseId || !lectureId) {
+      console.error("Invalid course or lecture ID");
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("lectureTitle", lectureTitle);
+      formData.append("isPreviewFree", isPreviewFree.toString()); // Convert to string
+
+      if (video) {
+        formData.append("file", video);
       }
+
+      const response = await axios.put(
+        `http://localhost:8000/api/v1/courses/${courseId}/lecture/${lectureId}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+          onUploadProgress: (progressEvent) => {
+            setUploadProgress(
+              Math.round((progressEvent.loaded * 100) / progressEvent.total)
+            );
+            setMediaProgress(true);
+          },
+        }
+      );
+
+      console.log(response.data);
+    } catch (error) {
+      console.error("Upload failed", error);
     }
   };
-
-  // Mock function to simulate lecture update
-  const editLectureHandler = async () => {
-    toast.success("Lecture updated successfully");
-    // Update lecture with the new title and video info
-    console.log({
-      lectureTitle,
-      videoInfo: uploadVideInfo,
-      isPreviewFree: isFree,
-    });
-  };
-
-  // Mock function to simulate lecture removal
   const removeLectureHandler = async () => {
-    toast.success("Lecture removed successfully");
+    const res = await axios.delete(
+      `http://localhost:8000/api/v1/courses/${courseId}/lecture/${lectureId}`,
+      {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: true,
+      }
+    );
+    console.log(res);
   };
-
   return (
     <Card>
       <CardHeader className="flex justify-between">
@@ -93,11 +97,7 @@ const LectureTab = () => {
           </CardDescription>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            disabled={false}
-            variant="destructive"
-            onClick={removeLectureHandler}
-          >
+          <Button variant="destructive" onClick={removeLectureHandler}>
             Remove Lecture
           </Button>
         </div>
@@ -119,15 +119,14 @@ const LectureTab = () => {
           <Input
             type="file"
             accept="video/*"
-            onChange={fileChangeHandler}
-            placeholder="Ex. Introduction to Javascript"
+            onChange={handleFileChange}
             className="w-fit"
           />
         </div>
         <div className="flex items-center space-x-2 my-5">
           <Switch
-            checked={isFree}
-            onCheckedChange={setIsFree}
+            checked={isPreviewFree}
+            onCheckedChange={setIsPreviewFree}
             id="airplane-mode"
           />
           <Label htmlFor="airplane-mode">Is this video FREE</Label>
@@ -141,9 +140,7 @@ const LectureTab = () => {
         )}
 
         <div className="mt-4">
-          <Button disabled={btnDisable} onClick={editLectureHandler}>
-            Update Lecture
-          </Button>
+          <Button onClick={handleSubmit}>Update Lecture</Button>
         </div>
       </CardContent>
     </Card>

@@ -28,7 +28,7 @@ export const postJob = async(req,res)=>{
             success:true
         })
     } catch (error) {
-       console.log(error) 
+       console.log(error);
     }
 }
 

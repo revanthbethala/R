@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useLayoutEffect } from "react";
-import { Mic } from "lucide-react";
+import { AlertTriangle, Mic } from "lucide-react";
 import useGemini from "@/myComponents/useGemini";
 import { useInterviewStore } from "@/store/useInterviewStore";
 import useSpeechToText from "react-hook-speech-to-text";
@@ -10,7 +10,7 @@ import axios from "axios";
 import { useUser } from "@clerk/clerk-react";
 import * as blazeface from "@tensorflow-models/blazeface";
 import * as tf from "@tensorflow/tfjs";
-
+import { motion } from "framer-motion";
 function GenerateQuestions() {
   const { formData } = useInterviewStore();
   const { role, interviewType, numberOfQuestions, experience } = formData;
@@ -87,7 +87,6 @@ function GenerateQuestions() {
               {questions[currentQuestionIndex]}
             </h2>
 
-            {/* Display the current answer */}
             <div className="mt-4">
               <h3 className="font-semibold">Your Answer:</h3>
               <p className="text-lg">
@@ -122,73 +121,75 @@ function GenerateQuestions() {
     </div>
   );
 }
-
 const WebCamComponent = () => {
-  const [faceDetected, setFaceDetected] = useState(false);
   const [faceCount, setFaceCount] = useState(0);
   const webcamRef = useRef(null);
 
   useEffect(() => {
     const loadModel = async () => {
-      await tf.ready(); // Wait for TensorFlow.js to be ready
+      await tf.ready();
       const model = await blazeface.load();
       detectFace(model);
     };
-
     loadModel();
   }, []);
 
   const detectFace = async (model) => {
-    const interval = setInterval(async () => {
+    setInterval(async () => {
       const video = webcamRef.current?.video;
       if (!video) return;
-
       const predictions = await model.estimateFaces(video, false);
-      const detected = predictions.length > 0;
       setFaceCount(predictions.length);
-      setFaceDetected(detected);
-    }, 100);
-
-    return () => clearInterval(interval);
+    }, 500);
   };
 
   return (
-    <div>
-      <h1>Face Detection</h1>
-      <Webcam ref={webcamRef} />
-      {faceDetected ? (
-        <div>
-          <h2>Face Detected</h2>
-          <p>
-            <strong>Number of Faces:</strong> {faceCount}
-          </p>
-          <p>Face Detection Status: {faceDetected.toString()}</p>
-        </div>
-      ) : (
-        <p>No face detected. Please look into the camera.</p>
-      )}
+    <div className="relative">
+      <Webcam ref={webcamRef} className="rounded-xl pb-3" />
+      {faceCount === 0 || faceCount > 1 ? (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          className="absolute top-2 left-2 bg-red-600 text-white p-3 rounded-lg flex items-center gap-2"
+        >
+          <AlertTriangle className="w-5 h-5" />
+          {faceCount === 0 ? "No face detected!" : "Multiple faces detected!"}
+        </motion.div>
+      ) : null}
     </div>
   );
 };
 
-// Recording Button Component
-const RecordingButton = ({ isRecording, startRecording, stopRecording }) => {
+interface RecordingButtonProps {
+  isRecording: boolean;
+  startRecording: () => void;
+  stopRecording: () => void;
+}
+
+const RecordingButton: React.FC<RecordingButtonProps> = ({
+  isRecording,
+  startRecording,
+  stopRecording,
+}) => {
   return (
     <button
       onClick={isRecording ? stopRecording : startRecording}
-      className={`rounded-lg px-3 py-2 font-semibold text-white w-fit outline-0 ${
+      className={`rounded-lg px-3 py-2 mt-5 font-medium text-white outline-0 ${
         isRecording ? "bg-red-600" : "bg-blue-700"
-      }`}
+      } flex gap-2 items-center`}
     >
-      <div className="flex gap-2">
-        <Mic />
-        {isRecording ? "Stop Recording" : "Record Answer"}
-      </div>
+      <Mic />
+      {isRecording ? "Stop Recording" : "Record Answer"}
     </button>
   );
 };
+interface ShowResultsProps {
+  answers: string[];
+  questions: string[];
+}
 
-function ShowResults({ answers, questions }) {
+const ShowResults: React.FC<ShowResultsProps> = ({ answers, questions }) => {
   const exampleFormat = `{
     overallPerformance:"Satisfactory","Unsatisfactory",
     overallAssessment:"need to improve at specific field or everything is good"

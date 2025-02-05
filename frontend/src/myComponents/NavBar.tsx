@@ -8,9 +8,9 @@ function NavBar() {
   const { isSignedIn } = useUser();
   const navigate = useNavigate();
   return (
-    <div className="h-fit">
+    <div className="">
       <header className="items-center">
-        <nav className="flex flex-row justify-between items-center px-4 py-2">
+        <nav className="flex flex-row justify-between items-center px-4 ">
           <Logo size={"2xl"} />
 
           {/* Desktop Navigation */}
@@ -18,11 +18,8 @@ function NavBar() {
             <NavLink to="">
               <li className="li-style">Home</li>
             </NavLink>
-            <NavLink to="courses">
+            <NavLink to="course">
               <li className="li-style">Courses</li>
-            </NavLink>
-            <NavLink to="jobs">
-              <li className="li-style">Jobs</li>
             </NavLink>
             <NavLink to="tests">
               <li className="li-style">Assessment</li>
@@ -71,11 +68,8 @@ function NavBar() {
             <NavLink to="/" onClick={() => setIsMobileMenuOpen(false)}>
               <li className="li-style">Home</li>
             </NavLink>
-            <NavLink to="courses" onClick={() => setIsMobileMenuOpen(false)}>
+            <NavLink to="course" onClick={() => setIsMobileMenuOpen(false)}>
               <li className="li-style">Courses</li>
-            </NavLink>
-            <NavLink to="jobs">
-              <li className="li-style">Jobs</li>
             </NavLink>
             <NavLink to="tests" onClick={() => setIsMobileMenuOpen(false)}>
               <li className="li-style">Assessment</li>
@@ -106,7 +100,6 @@ function NavBar() {
           </ul>
         )}
       </header>
-      <Outlet />
     </div>
   );
 }
