@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import useGet from "@/myComponents/useGet";
 import { CheckCircle, CheckCircle2, CirclePlay } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -20,35 +20,21 @@ interface CourseData {
 }
 
 const CourseProgress = () => {
-  const params = useParams<{ courseId: string }>(); // Type the params to include courseId
-  const courseId = params.courseId;
+  const { courseId } = useParams<{ courseId: string }>();
+  const { data, isLoading, error } = useGet(`courses/${courseId}/lectures`);
 
-  const {data,isLoading,error} = useGet(`courses/${courseId}/lectures`)
-  console.log(data);
-  const courseData: CourseData = {
-    courseTitle: "Learn React from Scratch",
-    lectures: [
-      {
-        _id: "1",
-        lectureTitle: "Introduction to React",
-        videoUrl: "https://example.com/video1.mp4",
-      },
-      {
-        _id: "2",
-        lectureTitle: "React State and Props",
-        videoUrl: "https://example.com/video2.mp4",
-      },
-      // Add more lectures as needed
-    ],
-  };
+  const [courseData, setCourseData] = useState<CourseData | null>(null);
+  const [currentLecture, setCurrentLecture] = useState<Lecture | null>(null);
+  const [completedLectures, setCompletedLectures] = useState<string[]>([]);
+  const [completed, setCompleted] = useState<boolean>(false);
 
-  const [currentLecture, setCurrentLecture] = useState<Lecture>(
-    courseData.lectures[0]
-  );
-  const [completedLectures, setCompletedLectures] = useState<string[]>([]); // Use string[] for lecture IDs
-  const [completed, setCompleted] = useState<boolean>(false); // Boolean for course completion
+  useEffect(() => {
+    if (data) {
+      setCourseData({ courseTitle: data.courseTitle, lectures: data.lectures });
+      setCurrentLecture(data.lectures[0] || null);
+    }
+  }, [data]);
 
-  // Handle lecture completion
   const handleLectureProgress = (lectureId: string) => {
     if (!completedLectures.includes(lectureId)) {
       setCompletedLectures((prev) => [...prev, lectureId]);
@@ -70,18 +56,20 @@ const CourseProgress = () => {
     toast.success("Course marked as incomplete");
   };
 
+  if (isLoading) return <p>Loading...</p>;
+  if (error) return <p>Error loading course data</p>;
+
   return (
     <div className="max-w-7xl mx-auto p-4">
-      {/* Display course name */}
       <div className="flex justify-between mb-4">
-        <h1 className="text-2xl font-bold">{courseData.courseTitle}</h1>
+        <h1 className="text-2xl font-bold">{courseData?.courseTitle}</h1>
         <Button
           onClick={completed ? handleInCompleteCourse : handleCompleteCourse}
           variant={completed ? "outline" : "default"}
         >
           {completed ? (
             <div className="flex items-center">
-              <CheckCircle className="h-4 w-4 mr-2" /> <span>Completed</span>{" "}
+              <CheckCircle className="h-4 w-4 mr-2" /> <span>Completed</span>
             </div>
           ) : (
             "Mark as completed"
@@ -90,29 +78,28 @@ const CourseProgress = () => {
       </div>
 
       <div className="flex flex-col md:flex-row gap-6">
-        {/* Video section */}
         <div className="flex-1 md:w-3/5 h-fit rounded-lg shadow-lg p-4">
-          <div>
-            <video
-              src={currentLecture?.videoUrl}
-              controls
-              className="w-full h-auto md:rounded-lg"
-              onPlay={() => handleLectureProgress(currentLecture._id)}
-            />
-          </div>
-          {/* Display current watching lecture title */}
-          <div className="mt-2">
-            <h3 className="font-medium text-lg">
-              {`Lecture ${
-                courseData.lectures.findIndex(
-                  (lec) => lec._id === currentLecture._id
-                ) + 1
-              } : ${currentLecture.lectureTitle}`}
-            </h3>
-          </div>
+          {currentLecture && (
+            <>
+              <video
+                src={currentLecture.videoUrl}
+                controls
+                className="w-full h-auto md:rounded-lg"
+                onPlay={() => handleLectureProgress(currentLecture._id)}
+              />
+              <div className="mt-2">
+                <h3 className="font-medium text-lg">
+                  {`Lecture ${
+                    courseData?.lectures?.findIndex(
+                      (lec) => lec._id === currentLecture._id
+                    ) + 1
+                  } : ${currentLecture.lectureTitle}`}
+                </h3>
+              </div>
+            </>
+          )}
         </div>
 
-        {/* Lecture Sidebar */}
         <div className="flex flex-col w-full md:w-2/5 border-t md:border-t-0 md:border-l border-gray-200 md:pl-4 pt-4 md:pt-0">
           <h2 className="font-semibold text-xl mb-4">Course Lectures</h2>
           <div className="flex-1 overflow-y-auto">
@@ -139,7 +126,7 @@ const CourseProgress = () => {
                   </div>
                   {completedLectures.includes(lecture._id) && (
                     <Badge
-                      variant={"outline"}
+                      variant="outline"
                       className="bg-green-200 text-green-600"
                     >
                       Completed
