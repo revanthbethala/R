@@ -53,14 +53,14 @@ const AddCourse = () => {
     }
   };
   return (
-    <div className="flex-1 mx-10">
+    <div className="flex flex-col items-center justify-center">
       <div className="mb-4">
         <h1 className="font-bold text-xl">
           Let's add a course, provide some basic details for your new course
         </h1>
         <p className="text-sm">Add your courses</p>
       </div>
-      <div className="space-y-4">
+      <div className="space-y-4 w-1/2 bg-blue-300 bg-opacity-15 ">
         <div>
           <Label>Title</Label>
           <Input
