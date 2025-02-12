@@ -1,32 +1,26 @@
-import { lazy, Suspense } from "react";
+import { Suspense } from "react";
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import Loading from "./pages/Loading";
 import NavBar from "./myComponents/NavBar";
-const ProtectedRoute = lazy(() => import("./pages/ProtectedRoute"));
-const Resume = lazy(() => import("./pages/Resume"));
-const Login = lazy(() => import("./pages/Login"));
-const Signup = lazy(() => import("./pages/Signup"));
-import Certificate from "./myComponents/Certificate";
-import MockInterviewForm from "./MockInterviews/MockInterviewForm";
-import MockInterview from "./MockInterviews/MockInterview";
-import MockInterviewInstructions from "./MockInterviews/MockInterviewInstructions";
-import CourseDetails from "./Courses/CourseDetails";
-import Course from "./Courses/Course";
-import CourseProgress from "./Courses/CourseProgress";
-import CreateLecture from "./admin/lecture/CreateLecture";
-import EditLecture from "./admin/lecture/EditLecture";
-import AddCourse from "./admin/course/AddCourse";
-import EditCourse from "./admin/course/EditCourse";
+import Assessments from "./pages/Assessments";
 import AssessmentForm from "./Assesments/AssesmentForm";
-import AssesmentInstructions from "./Assesments/AssesmentInstructions";
-import CourseTab from "./admin/course/CourseTab";
-import Dashboard from "./pages/Dashboard";
-const Assesment = lazy(() => import("./Assesments/Assesment"));
-const UserPreferences = lazy(() => import("./pages/UserPreferences"));
-const Compiler = lazy(() => import("./pages/Compiler"));
+import AssessmentInstructions from "./Assesments/AssesmentInstructions";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 import Home from "./pages/Home";
+import UserPreferences from "./pages/UserPreferences";
+import AssessmentQuestions from "./Assesments/AssesmentQuestions";
+import MockInterviewForm from "./MockInterviews/MockInterviewForm";
+import MockInterviewInstructions from "./MockInterviews/MockInterviewInstructions";
+import MockInterview from "./pages/MockInterview";
+import MockInterviewQuestions from "./MockInterviews/MockInterviewQuestions";
+import Courses from "./pages/Courses";
+import CourseDetails from "./Courses/CourseDetails";
+import CourseProgress from "./Courses/CourseProgress";
+import Compiler from "./pages/Compiler";
+import Course from "./Courses/Course";
+import { P } from "node_modules/@clerk/clerk-react/dist/useAuth-DOW6TYyu.d.mts";
 
-// Layout Component for Pages with NavBar
 const Layout = () => (
   <>
     <NavBar />
@@ -38,120 +32,69 @@ function App() {
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <Layout />, // Ensure NavBar wraps child routes properly
+      element: <Layout />,
       children: [
         { path: "", element: <Home /> },
         {
-          path: "course",
-          element: (
-            <ProtectedRoute>
-              <Course />
-            </ProtectedRoute>
-          ),
+          path: "assessments",
+          element: <Assessments />,
+          children: [
+            {
+              path: "",
+              element: <AssessmentForm />,
+            },
+            {
+              path: "instructions",
+              element: <AssessmentInstructions />,
+            },
+            {
+              path: "start/:id",
+              element: <AssessmentQuestions />,
+            },
+          ],
         },
         {
-          path: "course/search",
-          element: (
-            <ProtectedRoute>
-              <CourseTab />
-            </ProtectedRoute>
-          ),
+          path: "mockInterview",
+          element: <MockInterview />,
+          children: [
+            {
+              path: "",
+              element: <MockInterviewForm />,
+            },
+            {
+              path: "instructions",
+              element: <MockInterviewInstructions />,
+            },
+            {
+              path: "mockInterview/start",
+              element: <MockInterviewQuestions />,
+            },
+          ],
         },
         {
-          path: "course-detail/:id",
-          element: (
-            <ProtectedRoute>
-              <CourseDetails />
-            </ProtectedRoute>
-          ),
+          path: "courses/",
+          element: <Courses />,
+          children: [
+            { path: "", element: <Course /> },
+            {
+              path: "course-detail/:id",
+              element: <CourseDetails />,
+            },
+            {
+              path: "course-progress/:courseId",
+              element: <CourseProgress />,
+            },
+          ],
         },
         {
-          path: "course-progress/:courseId",
-          element: (
-            <ProtectedRoute>
-              <CourseProgress />
-            </ProtectedRoute>
-          ),
+          path: "/compiler",
+          element: <Compiler />,
         },
-        {
-          path: "dashboard",
-          element: (
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          ),
-        },
-        { path: "course/create", element: <AddCourse /> },
-        { path: "course/:courseId", element: <EditCourse /> },
-        { path: "course/:courseId/lecture", element: <CreateLecture /> },
-        {
-          path: "course/:courseId/lecture/:lectureId",
-          element: <EditLecture />,
-        },
-
-        {
-          path: "tests",
-          element: (
-            <ProtectedRoute>
-              <AssessmentForm />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "tests/instructions",
-          element: (
-            <ProtectedRoute>
-              <AssesmentInstructions />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "tests/start/:id",
-          element: (
-            <ProtectedRoute>
-              <Assesment />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "mockinterview",
-          element: (
-            <ProtectedRoute>
-              <MockInterviewForm />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "mockinterview/instructions",
-          element: (
-            <ProtectedRoute>
-              <MockInterviewInstructions />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "mockinterview/start/:id",
-          element: (
-            <ProtectedRoute>
-              <MockInterview />
-            </ProtectedRoute>
-          ),
-        },
-        { path: "compiler", element: <Compiler /> },
-        { path: "resume-builder", element: <Resume /> },
-        {
-          path: "user-preferences",
-          element: (
-            <ProtectedRoute>
-              <UserPreferences />
-            </ProtectedRoute>
-          ),
-        },
-        { path: "certificate", element: <Certificate /> },
       ],
     },
     { path: "login", element: <Login /> },
     { path: "signup", element: <Signup /> },
+    { path: "/user-preferences", element: <UserPreferences /> },
   ]);
 
   return (

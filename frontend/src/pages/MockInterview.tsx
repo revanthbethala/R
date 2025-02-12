@@ -1,7 +1,7 @@
 import { Outlet } from "react-router";
 
-const Courses = () => {
+const MockInterview = () => {
   return <Outlet />;
 };
 
-export default Courses;
+export default MockInterview;

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink, Outlet, useNavigate } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import { Menu, X } from "lucide-react";
 import Logo from "./Logo";
 import { UserButton, useUser } from "@clerk/clerk-react";
@@ -18,10 +18,10 @@ function NavBar() {
             <NavLink to="">
               <li className="li-style">Home</li>
             </NavLink>
-            <NavLink to="course">
+            <NavLink to="courses">
               <li className="li-style">Courses</li>
             </NavLink>
-            <NavLink to="tests">
+            <NavLink to="assessments">
               <li className="li-style">Assessment</li>
             </NavLink>
             <NavLink to="mockInterview">
@@ -68,7 +68,7 @@ function NavBar() {
             <NavLink to="/" onClick={() => setIsMobileMenuOpen(false)}>
               <li className="li-style">Home</li>
             </NavLink>
-            <NavLink to="course" onClick={() => setIsMobileMenuOpen(false)}>
+            <NavLink to="courses" onClick={() => setIsMobileMenuOpen(false)}>
               <li className="li-style">Courses</li>
             </NavLink>
             <NavLink to="tests" onClick={() => setIsMobileMenuOpen(false)}>

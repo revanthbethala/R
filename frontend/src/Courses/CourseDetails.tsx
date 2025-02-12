@@ -27,7 +27,7 @@ const CourseDetails = () => {
   const lectures = course?.lectures || [];
 
   const handleContinueCourse = () => {
-    navigate(`/course-progress/${courseId}`);
+    navigate(`../course-progress/${courseId}`);
   };
 
   return (
