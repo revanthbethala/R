@@ -3,11 +3,7 @@ import { useAssessmentStore } from "../store/useAssesmentStore";
 import { useUser } from "@clerk/clerk-react";
 import axios from "axios";
 
-<<<<<<< HEAD
 function AssessmentInstructions() {
-=======
-function AssesmentInstructions() {
->>>>>>> 0d33962291c96b3a3291746237e3e71405e15834
   const navigate = useNavigate();
   const { formData } = useAssessmentStore();
   const {
@@ -118,8 +114,4 @@ function AssesmentInstructions() {
   );
 }
 
-<<<<<<< HEAD
 export default AssessmentInstructions;
-=======
-export default AssesmentInstructions;
->>>>>>> 0d33962291c96b3a3291746237e3e71405e15834

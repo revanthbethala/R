@@ -16,6 +16,9 @@ import MockInterview from "./pages/MockInterview";
 import MockInterviewQuestions from "./MockInterviews/MockInterviewQuestions";
 import Course from "./Courses/Course";
 import Courses from "./pages/Courses";
+import CourseDetails from "./Courses/CourseDetails";
+import CourseProgress from "./Courses/CourseProgress";
+import Compiler from "./pages/Compiler";
 
 const Layout = () => (
   <>
@@ -68,18 +71,29 @@ function App() {
           ],
         },
         {
-          path: "courses",
+          path: "courses/",
           element: <Courses />,
-          children: [{ path: "", element: <Course /> }],
+          children: [
+            { path: "", element: <Course /> },
+            {
+              path: "course-detail/:id",
+              element: <CourseDetails />,
+            },
+            {
+              path: "course-progress/:courseId",
+              element: <CourseProgress />,
+            },
+          ],
+        },
+        {
+          path: "/compiler",
+          element: <Compiler />,
         },
       ],
     },
     { path: "login", element: <Login /> },
     { path: "signup", element: <Signup /> },
-<<<<<<< HEAD
     { path: "/user-preferences", element: <UserPreferences /> },
-=======
->>>>>>> 0d33962291c96b3a3291746237e3e71405e15834
   ]);
 
   return (
