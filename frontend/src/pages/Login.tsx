@@ -16,7 +16,7 @@ function Login() {
           />
         </div>
         <div>
-          <SignIn signUpUrl="/signup" forceRedirectUrl={"/user-preferences"} />
+          <SignIn signUpUrl="/signup" forceRedirectUrl="/" />
         </div>
       </div>
     </section>

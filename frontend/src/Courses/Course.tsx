@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import useGet from "@/myComponents/useGet";
+import { Search } from "lucide-react";
 
 interface Course {
   _id: string;
@@ -26,58 +29,119 @@ interface CourseCardProps {
 
 export const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
   return (
-    <div>
+    <motion.div
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.98 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className="cursor-pointer"
+    >
       <Link to={`course-detail/${course._id}`}>
-        <Card className="bg-white overflow-hidden rounded-lg shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300">
+        <Card className="bg-white overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300">
           <div className="relative">
             <img
               src={course.courseThumbnail}
               alt={course.courseTitle}
-              className="w-full h-36 object-cover rounded-t-lg"
+              className="w-full h-44 object-cover rounded-t-2xl"
             />
+            <Badge className="absolute top-3 left-3 bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded-full">
+              {course.courseLevel}
+            </Badge>
           </div>
-          <CardContent className="px-5 py-4 space-y-3">
-            <h1 className="hover:underline font-bold text-lg truncate">
+          <CardContent className="px-5 py-4 space-y-4">
+            <h2 className="font-semibold text-lg truncate hover:underline">
               {course.courseTitle}
-            </h1>
-            <div className="flex items-center justify-between">
-              <Badge className="bg-blue-600 text-white px-2 py-1 text-xs rounded-full hover:bg-blue-800">
-                {course.courseLevel}
-              </Badge>
-            </div>
-
-            <p className="text-sm text-gray-600">{course.description}</p>
-
+            </h2>
+            <p className="text-sm text-gray-600 line-clamp-2">
+              {course.description}
+            </p>
             <div className="flex justify-between items-center text-sm text-gray-500">
               <p>{course.enrolledStudents?.length} students enrolled</p>
             </div>
-
-            <div className="text-lg font-bold">
-              <span>₹{course.coursePrice}</span>
-            </div>
-            <div className="text-xs text-gray-400">
-              Published on: {new Date(course.createdAt).toLocaleDateString()}
+            <div className="flex justify-between items-center">
+              <span className="text-lg font-bold text-gray-900">
+                ₹{course.coursePrice}
+              </span>
+              <p className="text-xs text-gray-400">
+                Published: {new Date(course.createdAt).toLocaleDateString()}
+              </p>
             </div>
           </CardContent>
         </Card>
       </Link>
-    </div>
+    </motion.div>
   );
 };
 
 const Course = () => {
   const { data, isLoading, error } = useGet("courses/published");
-  console.log(data);
-
-  if (isLoading) return <p>Loading...</p>;
-  if (error) return <p>Error loading courses.</p>;
+  const [searchTerm, setSearchTerm] = useState("");
+  const filteredCourses = data?.courses?.filter((course: Course) =>
+    course.courseTitle.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {data?.courses?.map((course: Course) => (
-        <CourseCard key={course._id} course={course} />
-      ))}
+    <div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="text-center py-8 px-6"
+      >
+        <h2 className="text-3xl font-bold text-gray-800">
+          Explore Our Courses
+        </h2>
+        <p className="text-gray-600 mt-2">
+          Find the perfect course to boost your career
+        </p>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="relative w-full max-w-md mx-auto mt-6"
+        >
+          <input
+            type="text"
+            placeholder="Search for a course..."
+            className="w-full px-5 py-3 pl-12 text-gray-800 border border-gray-300 rounded-full shadow-md outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <Search
+            className="absolute top-1/2 left-4 transform -translate-y-1/2 text-gray-500"
+            size={20}
+          />
+        </motion.div>
+      </motion.div>
+
+      {/* 🎯 Course Cards Section */}
+      <motion.div
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-6 py-10"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        {isLoading && (
+          <p className="text-center text-lg font-semibold">Loading...</p>
+        )}
+        {error && (
+          <p className="text-center text-red-500 font-medium">
+            Error loading courses.
+          </p>
+        )}
+        {filteredCourses?.length > 0 ? (
+          filteredCourses.map((course: Course) => (
+            <CourseCard key={course._id} course={course} />
+          ))
+        ) : (
+          <p className="text-center text-gray-500 col-span-full">
+            No courses found.
+          </p>
+        )}
+      </motion.div>
     </div>
   );
 };
+
 export default Course;

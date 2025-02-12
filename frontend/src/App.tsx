@@ -14,11 +14,12 @@ import MockInterviewForm from "./MockInterviews/MockInterviewForm";
 import MockInterviewInstructions from "./MockInterviews/MockInterviewInstructions";
 import MockInterview from "./pages/MockInterview";
 import MockInterviewQuestions from "./MockInterviews/MockInterviewQuestions";
-import Course from "./Courses/Course";
 import Courses from "./pages/Courses";
 import CourseDetails from "./Courses/CourseDetails";
 import CourseProgress from "./Courses/CourseProgress";
 import Compiler from "./pages/Compiler";
+import Course from "./Courses/Course";
+import { P } from "node_modules/@clerk/clerk-react/dist/useAuth-DOW6TYyu.d.mts";
 
 const Layout = () => (
   <>
