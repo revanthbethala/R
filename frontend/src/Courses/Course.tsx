@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import useGet from "@/myComponents/useGet";
 
@@ -14,7 +13,7 @@ interface Course {
   createdAt: string;
   creator: { name?: string; photoUrl?: string };
   description: string;
-  enrolledStudents: any[];
+  enrolledStudents: number[];
   isPublished: boolean;
   lectures: string[];
   subTitle: string;

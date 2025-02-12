@@ -68,7 +68,11 @@ function NavBar() {
             <NavLink to="/" onClick={() => setIsMobileMenuOpen(false)}>
               <li className="li-style">Home</li>
             </NavLink>
+<<<<<<< HEAD
             <NavLink to="courses" onClick={() => setIsMobileMenuOpen(false)}>
+=======
+            <NavLink to="course" onClick={() => setIsMobileMenuOpen(false)}>
+>>>>>>> 0d33962291c96b3a3291746237e3e71405e15834
               <li className="li-style">Courses</li>
             </NavLink>
             <NavLink to="tests" onClick={() => setIsMobileMenuOpen(false)}>

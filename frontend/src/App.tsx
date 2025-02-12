@@ -14,11 +14,9 @@ import MockInterviewForm from "./MockInterviews/MockInterviewForm";
 import MockInterviewInstructions from "./MockInterviews/MockInterviewInstructions";
 import MockInterview from "./pages/MockInterview";
 import MockInterviewQuestions from "./MockInterviews/MockInterviewQuestions";
-import path from "path";
 import Course from "./Courses/Course";
 import Courses from "./pages/Courses";
 
-// Layout Component for Pages with NavBar
 const Layout = () => (
   <>
     <NavBar />
@@ -78,7 +76,10 @@ function App() {
     },
     { path: "login", element: <Login /> },
     { path: "signup", element: <Signup /> },
+<<<<<<< HEAD
     { path: "/user-preferences", element: <UserPreferences /> },
+=======
+>>>>>>> 0d33962291c96b3a3291746237e3e71405e15834
   ]);
 
   return (
