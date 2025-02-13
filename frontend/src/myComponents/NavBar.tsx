@@ -27,6 +27,9 @@ function NavBar() {
             <NavLink to="mockInterview">
               <li className="li-style">Mock Interviews</li>
             </NavLink>
+            <NavLink to="jobs">
+              <li className="li-style">Jobs</li>
+            </NavLink>
             <NavLink to="compiler">
               <li className="li-style">Compiler</li>
             </NavLink>
@@ -79,6 +82,12 @@ function NavBar() {
               onClick={() => setIsMobileMenuOpen(false)}
             >
               <li className="li-style">Mock Interviews</li>
+            </NavLink>
+            <NavLink
+              to="jobs"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <li className="li-style">Jobs</li>
             </NavLink>
             <NavLink to="compiler" onClick={() => setIsMobileMenuOpen(false)}>
               <li className="li-style">Compiler</li>

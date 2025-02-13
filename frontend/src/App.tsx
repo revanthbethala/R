@@ -19,7 +19,9 @@ import CourseDetails from "./Courses/CourseDetails";
 import CourseProgress from "./Courses/CourseProgress";
 import Compiler from "./pages/Compiler";
 import Course from "./Courses/Course";
-import { P } from "node_modules/@clerk/clerk-react/dist/useAuth-DOW6TYyu.d.mts";
+import Jobs from "./pages/Jobs";
+import JobCards from "./Jobs/JobCards";
+import Dashboard from "./admin/Dashboard";
 
 const Layout = () => (
   <>
@@ -72,7 +74,7 @@ function App() {
           ],
         },
         {
-          path: "courses/",
+          path: "courses",
           element: <Courses />,
           children: [
             { path: "", element: <Course /> },
@@ -85,6 +87,20 @@ function App() {
               element: <CourseProgress />,
             },
           ],
+        },
+        {
+          path: "jobs",
+          element: <Jobs />,
+          children: [
+            {
+              path: "",
+              element: <JobCards />,
+            },
+          ],
+        },
+        {
+          path: "dashboard",
+          element: <Dashboard />,
         },
         {
           path: "/compiler",
