@@ -1,138 +1,174 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import useGet from "@/myComponents/useGet";
-import { Search } from "lucide-react";
+import { Search, Briefcase, MapPin, Clock, Users } from "lucide-react";
 import Loading from "@/pages/Loading";
+import { Button } from "@/components/ui/button";
 
-interface Course {
+interface Job {
   _id: string;
-  category: string;
-  courseLevel: string;
-  coursePrice: number;
-  courseThumbnail: string;
-  courseTitle: string;
+  company: { name: string };
   createdAt: string;
-  creator: { name?: string; photoUrl?: string };
   description: string;
-  enrolledStudents: number[];
-  isPublished: boolean;
-  lectures: string[];
-  subTitle: string;
-  updatedAt: string;
+  experienceLevel: number;
+  jobtype: string;
+  location: string;
+  positions: number;
+  requirements: string[];
 }
 
-interface CourseCardProps {
-  course: Course;
+interface JobCardProps {
+  job: Job;
 }
 
-export const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
+const JobCard: React.FC<JobCardProps> = ({ job }) => {
   return (
     <motion.div
-      whileHover={{ scale: 1.05 }}
+      whileHover={{ scale: 1.01 }}
       whileTap={{ scale: 0.98 }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
       className="cursor-pointer"
     >
-      <Link to={`course-detail/${course._id}`}>
-        <Card className="bg-white overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300">
-          <div className="relative">
-            <img
-              src={course.courseThumbnail}
-              alt={course.courseTitle}
-              className="w-full h-44 object-cover rounded-t-2xl"
-            />
-            <Badge className="absolute top-3 left-3 bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded-full">
-              {course.courseLevel}
+      <Card className="">
+        <CardContent className="p-6 space-y-4">
+          <div className="flex justify-between items-start">
+            <h2 className="font-bold text-xl truncate uppercase tracking-wide">
+              {job.title}
+            </h2>
+            <Badge className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-full text-xs font-semibold capitalize">
+              {job.jobtype}
             </Badge>
           </div>
-          <CardContent className="px-5 py-4 space-y-4">
-            <h2 className="font-semibold text-lg truncate hover:underline">
-              {course.courseTitle}
-            </h2>
-            <p className="text-sm text-gray-600 line-clamp-2">
-              {course.description}
+          <p className="text-md   capitalize">{job.company.name}</p>
+          <p className="text-sm text-gray-600 line-clamp-2 capitalize">
+            <p className="text-sm text-gray-600 capitalize">
+              {job.description.length > 45
+                ? `${job.description.slice(0, 45)}...`
+                : job.description}
             </p>
-            <div className="flex justify-between items-center text-sm text-gray-500">
-              <p>{course.enrolledStudents?.length} students enrolled</p>
+          </p>
+          <div className="grid grid-cols-2 gap-3 text-sm text-gray-500">
+            <div className="flex items-center space-x-2">
+              <MapPin size={16} className="text-blue-500 capitalize" />
+              <span>{job.location}</span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-lg font-bold text-gray-900">
-                ₹{course.coursePrice}
-              </span>
-              <p className="text-xs text-gray-400">
-                Published: {new Date(course.createdAt).toLocaleDateString()}
-              </p>
+            <div className="flex items-center space-x-2">
+              <Briefcase size={16} className="text-green-500" />
+              <span>{job.experienceLevel} years</span>
             </div>
-          </CardContent>
-        </Card>
-      </Link>
+            <div className="flex items-center space-x-2">
+              <Users size={16} className="text-purple-500" />
+              <span>{job.positions} positions</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Clock size={16} className="text-orange-500" />
+              <span>{new Date(job.createdAt).toLocaleDateString()}</span>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2 mt-3">
+            {job.requirements.slice(0, 3).map((req, index) => (
+              <Badge
+                key={index}
+                variant="secondary"
+                className="text-xs font-medium"
+              >
+                {req}
+              </Badge>
+            ))}
+            {job.requirements.length > 3 && (
+              <Badge variant="secondary" className="text-xs font-medium">
+                +{job.requirements.length - 3} more
+              </Badge>
+            )}
+          </div>
+          <Button className="bg-blue-600 hover:bg-blue-700 ">
+            <NavLink to={`/jobs/job-detail/${job._id}`}>View Details</NavLink>
+          </Button>
+        </CardContent>
+      </Card>
     </motion.div>
   );
 };
 
 const JobCards = () => {
-  const { data, isLoading, error } = useGet("courses/published");
+  const { data, isLoading, error } = useGet("job/get");
   const [searchTerm, setSearchTerm] = useState("");
-  const filteredCourses = data?.courses?.filter((course: Course) =>
-    course.courseTitle.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (data?.jobs) {
+        setFilteredJobs(
+          data.jobs.filter(
+            (job: Job) =>
+              job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              job.location.toLowerCase().includes(searchTerm.toLowerCase())
+          )
+        );
+      }
+    }, 300); // Debounce for smoother search
+
+    return () => clearTimeout(timeout);
+  }, [searchTerm, data]);
 
   return (
-    <div>
+    <div className="max-w-7xl mx-auto px-6 py-2 ">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="text-center py-8 px-6"
+        className="text-center py-8"
       >
-        <h2 className="text-3xl font-bold text-gray-800">
-          Explore Our Courses
+        <h2 className="text-4xl font-extrabold text-gray-900 mb-2">
+          Explore Job Listings
         </h2>
-        <p className="text-gray-600 mt-2">
-          Find the perfect course to boost your career
+        <p className="text-xl text-gray-600 mb-8">
+          Find the perfect job for your career
         </p>
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="relative w-full max-w-md mx-auto mt-6"
+          className="relative w-full max-w-2xl mx-auto"
         >
           <input
             type="text"
-            placeholder="Search for a course..."
-            className="w-full px-5 py-3 pl-12 text-gray-800 border border-gray-300 rounded-full shadow-md outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+            placeholder="Search for a job or location..."
+            className="w-full px-6 py-4 pl-14 text-lg text-gray-800 border-2 border-gray-200 rounded-full shadow-sm outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <Search
-            className="absolute top-1/2 left-4 transform -translate-y-1/2 text-gray-500"
-            size={20}
+            className="absolute top-1/2 left-5 transform -translate-y-1/2 text-gray-400"
+            size={24}
           />
         </motion.div>
       </motion.div>
 
-      {/* 🎯 Course Cards Section */}
       {isLoading && <Loading />}
       {error && (
         <p className="text-center text-red-500 font-medium text-lg">
-          Error loading courses.
+          Error loading jobs.
         </p>
       )}
       <motion.div
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-6 py-10"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 py-12"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.5, staggerChildren: 0.1 }}
       >
-        {filteredCourses?.length > 0 &&
-          filteredCourses.map((course: Course) => (
-            <CourseCard key={course._id} course={course} />
-          ))}
+        {filteredJobs.length > 0 ? (
+          filteredJobs.map((job: Job) => <JobCard key={job._id} job={job} />)
+        ) : (
+          <p className="col-span-full text-center text-gray-500 font-medium text-xl">
+            No jobs found. Try adjusting your search.
+          </p>
+        )}
       </motion.div>
     </div>
   );

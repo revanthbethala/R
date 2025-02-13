@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from "react-router";
 import { Menu, X } from "lucide-react";
 import Logo from "./Logo";
 import { UserButton, useUser } from "@clerk/clerk-react";
+import { Button } from "@/components/ui/button";
 function NavBar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
   const { isSignedIn } = useUser();
@@ -49,6 +50,14 @@ function NavBar() {
             >
               {isSignedIn ? "Dashboard" : "Login/Sign Up"}
             </button>
+            {isSignedIn && (
+              <select className="p-2 outline-none font-semibold text-base">
+                <option value="">Switch Roles</option>
+                <option value="student">Student</option>
+                <option value="instructor">Instructor</option>
+                <option value="recruiter">Recruiter</option>
+              </select>
+            )}
             {isSignedIn && <UserButton />}
           </div>
 
@@ -83,15 +92,13 @@ function NavBar() {
             >
               <li className="li-style">Mock Interviews</li>
             </NavLink>
-            <NavLink
-              to="jobs"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
+            <NavLink to="jobs" onClick={() => setIsMobileMenuOpen(false)}>
               <li className="li-style">Jobs</li>
             </NavLink>
             <NavLink to="compiler" onClick={() => setIsMobileMenuOpen(false)}>
               <li className="li-style">Compiler</li>
             </NavLink>
+
             <div className="flex flex-col items-start ">
               <button
                 onClick={() =>
@@ -105,6 +112,16 @@ function NavBar() {
               >
                 {isSignedIn ? "Dashboard" : "Login/Sign Up"}
               </button>
+              {isSignedIn && (
+                <select className="font-semibold font-Inter cursor-pointer mt-4">
+                  <option value="" className="text-base w-screen ">
+                    Switch Roles
+                  </option>
+                  <option value="student">Student</option>
+                  <option value="instructor">Instructor</option>
+                  <option value="recruiter">Recruiter</option>
+                </select>
+              )}
             </div>
           </ul>
         )}

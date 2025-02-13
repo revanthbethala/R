@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 const URL: string = "http://localhost:8000/api/v1";
 
 function useGet(END_POINT) {
-  console.log(END_POINT);
   const [data, setData] = useState<any>(null);
   const [isLoading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -26,7 +25,7 @@ function useGet(END_POINT) {
     fetchData();
   }, [END_POINT]);
 
-  return {data, isLoading, error};
+  return { data, isLoading, error };
 }
 
 export default useGet;

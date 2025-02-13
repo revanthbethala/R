@@ -33,7 +33,7 @@ const AddCourse = () => {
     category,
   };
   console.log(courseData);
-  const createCourseHandler = async () => {
+  const  = async () => {
     try {
       const res = await axios.post(
         "http://localhost:8000/api/v1/courses/create",
