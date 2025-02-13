@@ -39,7 +39,7 @@ export const initiatePayment = async (req, res) => {
 
         const data = JSON.stringify(payload);
         const checksum = crypto.createHash("sha256").update(data + PHONEPE_SALT_KEY).digest("hex");
-        const finalXVerify = `${checksum}###${PHONEPE_SALT_INDEX}`;
+        const finalXVerify = `${checksum}###${PHONEPE_SALT_INDEX}`;  
 
         const response = await axios.post(`${PHONEPE_BASE_URL}/pay`, data, {
             headers: {
