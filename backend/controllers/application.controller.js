@@ -1,45 +1,69 @@
 import Application from "../models/application.model.js"
 import Job from "../models/jobs.model.js"
+import User from "../models/user.model.js";
 
-export const applyJob=async(req,res)=>{
+
+export const applyJob = async (req, res) => {
     try {
-        const {userId} = req.body
-        const jobId =req.params.id
-        console.log(userId,jobId)
-        if(!jobId){
-            res.status(404).json({
-                message:'id needed',
-                success:false
-            })
+        const { userId } = req.body;
+        const jobId = req.params.id;
+        
+        console.log(userId, jobId);
+
+        if (!jobId) {
+            return res.status(404).json({
+                message: 'Job ID is required',
+                success: false
+            });
         }
-        const existingApplication = await Application.findOne({job:jobId,applicant:userId})
-        if(existingApplication){
+        const user = await User.findOne({ userId });
+        
+        if (!user) {
             return res.status(400).json({
-                message:'you have  already applied for this job',
-                success:false
-            })
+                message: "User not found",
+                success: false
+            });
         }
-        const job = await Job.findById(jobId)
-        if(!job){
+
+        const userObjectId = user._id; 
+        const existingApplication = await Application.findOne({ job: jobId, applicant: userObjectId });
+
+        if (existingApplication) {
             return res.status(400).json({
-                message:'job not found',
-                success:false
-            })
+                message: 'You have already applied for this job',
+                success: false
+            });
         }
-        const newApplication  = await Application.create({
-            job:jobId,
-            applicant:userId
-        })
-        job.applications.push(newApplication._id)
-        await job.save()
+        const job = await Job.findById(jobId);
+
+        if (!job) {
+            return res.status(400).json({
+                message: 'Job not found',
+                success: false
+            });
+        }
+
+        const newApplication = await Application.create({
+            job: jobId,
+            applicant: userObjectId
+        });
+        job.applications.push(newApplication._id);
+        await job.save();
+
         return res.status(201).json({
-            message:'job applied successfully',
-            success:true
-        })
+            message: 'Job applied successfully',
+            success: true
+        });
+
     } catch (error) {
-        console.log(error)
+        console.error("Error in applyJob:", error);
+        res.status(500).json({
+            message: "Internal Server Error",
+            success: false,
+            error: error.message
+        });
     }
-}
+};
 
 export const getApplicants = async(req,res)=>{
     try {

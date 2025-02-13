@@ -34,7 +34,7 @@ export const postJob = async(req,res)=>{
 
 export const getAllJobs = async (req, res) => {
     try {
-        const jobs = await Job.find().populate({ path: "company" });
+        const jobs = await Job.find();
 
         if (!jobs || jobs.length === 0) {
             return res.status(404).json({
