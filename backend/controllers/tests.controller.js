@@ -30,32 +30,30 @@ export const storetestDetails = async (req, res) => {
 
 export const storeMarks = async (req, res) => {
   try {
-    const { userId, marksObtained } = req.body;
+    const { userId, marksObtained ,coinsObtained} = req.body;
     const  {testId} = req.params
 
-    // Find user
     const user = await User.findOne({ userId });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Find test
     const test = await Test.findById(testId);
     if (!test) {
       return res.status(404).json({ message: "Test not found" });
     }
 
-    // Ensure the test belongs to the user
     if (!user.tests.includes(test._id)) {
       return res.status(403).json({ message: "Test does not belong to this user" });
     }
 
-    // Update marks in the Test model
     test.marksObtained = marksObtained;
     await test.save();
 
-    // Update marks in the User model
     user.marksObtained = marksObtained; 
+    if(marksObtained>40) {
+      user.shuriCoins += coinsObtained;
+    }
     await user.save();
 
     res.status(200).json({ message: "Marks updated successfully", test });

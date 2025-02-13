@@ -37,7 +37,8 @@ export const storeMockDetails = async (req, res) => {
 
 export const storeMockMarks = async (req, res) => {
   try {
-    const { userId, marksObtained, testId } = req.body;
+    const { userId, marksObtained ,coinsObtained,testId} = req.body;
+    //const {testId}=req.params
     const mock = await Mock.findByIdAndUpdate(
       testId,
       { marksObtained },
@@ -49,17 +50,13 @@ export const storeMockMarks = async (req, res) => {
     res
       .status(200)
       .json({ message: "Mock test marks updated successfully", mock });
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { $push: { marksObtained: marksObtained } },
-      { new: true }
-    );
+      const user = await User.findOne({userId})
+      console.log(user)
+      user.shuriCoins+=coinsObtained
+      await user.save()
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    res
-      .status(200)
-      .json({ message: "User's marks updated successfully", user });
   } catch (error) {
     res
       .status(500)

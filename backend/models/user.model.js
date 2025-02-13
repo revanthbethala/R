@@ -33,8 +33,12 @@ const UserSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["student", "admin"],
+      enum: ["student", "instructor","recuiter"],
       default: "student",
+    },
+    shuriCoins:{
+      type:Number,
+      default:0
     },
     courses: [
       {

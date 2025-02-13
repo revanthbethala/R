@@ -18,4 +18,5 @@ const coursePurchaseSchema = new mongoose.Schema({
 });
 const coursePurchase = mongoose.model("coursePurchase", coursePurchaseSchema);
 
-export default coursePurchase;
+
+export default coursePurchase
