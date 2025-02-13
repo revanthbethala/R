@@ -56,7 +56,7 @@ function AssessmentForm() {
     }
 
     resetErrors();
-    navigate("/tests/instructions");
+    navigate("instructions");
   };
 
   return (
