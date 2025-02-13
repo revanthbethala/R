@@ -75,7 +75,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
   );
 };
 
-const Course = () => {
+const JobCards = () => {
   const { data, isLoading, error } = useGet("courses/published");
   const [searchTerm, setSearchTerm] = useState("");
   const filteredCourses = data?.courses?.filter((course: Course) =>
@@ -138,4 +138,4 @@ const Course = () => {
   );
 };
 
-export default Course;
+export default JobCards;
