@@ -1,11 +1,5 @@
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -19,12 +13,9 @@ import {
 } from "@/components/ui/select";
 import RichTextEditor from "@/myComponents/RichTextEditor";
 import axios from "axios";
-import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "sonner";
 
-// Define types for the course input state
 interface CourseInput {
   courseTitle: string;
   subTitle: string;
@@ -33,37 +24,8 @@ interface CourseInput {
   courseLevel: string;
   coursePrice: string;
   courseThumbnail: File | string;
+  isPublished: boolean;
 }
-
-// Define mock functions with appropriate types
-const mockEditCourse = async (
-  courseId: string,
-  input: CourseInput
-): Promise<{ message: string }> => {
-  // Simulate a successful course update response
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({ message: "Course updated successfully!" });
-    }, 1000);
-  });
-};
-
-const mockPublishCourse = async (
-  courseId: string,
-  action: "true" | "false"
-): Promise<{ data: { message: string } }> => {
-  // Simulate a publish/unpublish action
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        data: {
-          message:
-            action === "true" ? "Course published!" : "Course unpublished!",
-        },
-      });
-    }, 1000);
-  });
-};
 
 const CourseTab = () => {
   const [input, setInput] = useState<CourseInput>({
@@ -74,45 +36,33 @@ const CourseTab = () => {
     courseLevel: "",
     coursePrice: "",
     courseThumbnail: "",
+    isPublished: false,
   });
 
   const params = useParams();
-  const courseId = params.courseId as string; // Explicit type for courseId
-
-  // Mocked response for course data fetching
-  const courseByIdData = {
-    course: {
-      courseTitle: "Fullstack Developer",
-      subTitle: "Learn Fullstack Development",
-      description: "Comprehensive course on Fullstack Development.",
-      category: "Fullstack Development",
-      courseLevel: "Beginner",
-      coursePrice: "1999",
-      courseThumbnail: "",
-      isPublished: false,
-      lectures: [], // Empty lectures for demo
-    },
-  };
-
+  const courseId = params.id as string;
   const [previewThumbnail, setPreviewThumbnail] = useState<string>("");
   const navigate = useNavigate();
 
+  // Change input handler
   const changeEventHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setInput({ ...input, [name]: value });
+    setInput((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Handle category selection
   const selectCategory = (value: string) => {
-    setInput({ ...input, category: value });
+    setInput((prev) => ({ ...prev, category: value }));
   };
 
+  // Handle course level selection
   const selectCourseLevel = (value: string) => {
-    setInput({ ...input, courseLevel: value });
+    setInput((prev) => ({ ...prev, courseLevel: value }));
   };
 
-  // Handle file selection (thumbnail)
+  // Handle thumbnail selection
   const selectThumbnail = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target?.files?.[0];
+    const file = e.target.files?.[0];
     if (file) {
       setInput((prev) => ({ ...prev, courseThumbnail: file }));
       const fileReader = new FileReader();
@@ -120,20 +70,24 @@ const CourseTab = () => {
         setPreviewThumbnail(fileReader.result as string);
       fileReader.readAsDataURL(file);
     }
-    console.log("file is:", file);
   };
 
+  // Toggle Publish Status
+  const togglePublishStatus = () => {
+    setInput((prev) => ({ ...prev, isPublished: !prev.isPublished }));
+  };
+
+  // Update Course
   const updateCourseHandler = async () => {
     try {
       const formData = new FormData();
-
       formData.append("courseTitle", input.courseTitle);
       formData.append("subTitle", input.subTitle);
       formData.append("description", input.description);
       formData.append("category", input.category);
       formData.append("courseLevel", input.courseLevel);
       formData.append("coursePrice", input.coursePrice);
-
+      formData.append("isPublished", String(input.isPublished)); // Convert boolean to string
       if (input.courseThumbnail instanceof File) {
         formData.append("courseThumbnail", input.courseThumbnail);
       }
@@ -148,166 +102,154 @@ const CourseTab = () => {
           withCredentials: true,
         }
       );
-
       console.log("Course updated:", res.data);
     } catch (err) {
       console.error("Error updating course:", err);
     }
   };
-
-  const publishStatusHandler = async (action: "true" | "false") => {
-    try {
-      const response = await mockPublishCourse(courseId, action);
-      toast.success(response.data.message);
-    } catch (error) {
-      toast.error("Failed to publish or unpublish course");
-    }
+  const isFormComplete = () => {
+    return (
+      input.courseTitle.trim() !== "" &&
+      input.subTitle.trim() !== "" &&
+      input.description.trim() !== "" &&
+      input.category.trim() !== "" &&
+      input.courseLevel.trim() !== "" &&
+      input.coursePrice.trim() !== "" &&
+      (input.courseThumbnail instanceof File ||
+        typeof input.courseThumbnail === "string")
+    );
   };
 
-  if (!courseByIdData?.course) return <h1>Loading...</h1>;
-
   return (
-    <Card>
-      <CardHeader className="flex flex-row justify-between">
-        <div>
-          <CardTitle>Basic Course Information</CardTitle>
-          <CardDescription>
-            Make changes to your courses here. Click save when you're done.
-          </CardDescription>
-        </div>
+    <Card className="shadow-lg rounded-lg p-6 bg-white border border-gray-200">
+      <CardHeader className="flex flex-row justify-between items-center">
         <div className="space-x-2">
           <Button
-            disabled={courseByIdData?.course.lectures.length === 0}
             variant="outline"
-            onClick={() =>
-              publishStatusHandler(
-                courseByIdData?.course.isPublished ? "false" : "true"
-              )
+            onClick={togglePublishStatus}
+            disabled={!isFormComplete()}
+            className={`px-4 py-2 rounded-md border ${
+              isFormComplete()
+                ? "border-blue-500 hover:bg-blue-50"
+                : "border-gray-300 cursor-not-allowed opacity-50"
+            } focus:ring-2 focus:ring-blue-400`}
+            title={
+              !isFormComplete()
+                ? "Please fill all fields before publishing"
+                : ""
             }
           >
-            {courseByIdData?.course.isPublished ? "Unpublished" : "Publish"}
+            {input.isPublished ? "Unpublish" : "Publish"}
           </Button>
-          <Button>Remove Course</Button>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4 mt-5">
+      <CardContent className="mt-6 space-y-6">
+        <div>
+          <Label>Title</Label>
+          <Input
+            type="text"
+            name="courseTitle"
+            value={input.courseTitle}
+            onChange={changeEventHandler}
+            placeholder="Ex. Fullstack developer"
+          />
+        </div>
+        <div>
+          <Label>Subtitle</Label>
+          <Input
+            type="text"
+            name="subTitle"
+            value={input.subTitle}
+            onChange={changeEventHandler}
+            placeholder="Ex. Become a Fullstack developer from zero to hero"
+          />
+        </div>
+        <div>
+          <Label>Description</Label>
+          <RichTextEditor input={input} setInput={setInput} />
+        </div>
+        <div className="grid grid-cols-2 gap-6">
           <div>
-            <Label>Title</Label>
-            <Input
-              type="text"
-              name="courseTitle"
-              value={input.courseTitle}
-              onChange={changeEventHandler}
-              placeholder="Ex. Fullstack developer"
+            <Label>Category</Label>
+            <Select value={input.category} onValueChange={selectCategory}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select a category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Categories</SelectLabel>
+                  <SelectItem value="Next JS">Next JS</SelectItem>
+                  <SelectItem value="Data Science">Data Science</SelectItem>
+                  <SelectItem value="Frontend Development">
+                    Frontend Development
+                  </SelectItem>
+                  <SelectItem value="Fullstack Development">
+                    Fullstack Development
+                  </SelectItem>
+                  <SelectItem value="MERN Stack Development">
+                    MERN Stack Development
+                  </SelectItem>
+                  <SelectItem value="Javascript">Javascript</SelectItem>
+                  <SelectItem value="Python">Python</SelectItem>
+                  <SelectItem value="Docker">Docker</SelectItem>
+                  <SelectItem value="MongoDB">MongoDB</SelectItem>
+                  <SelectItem value="HTML">HTML</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>Course Level</Label>
+            <Select value={input.courseLevel} onValueChange={selectCourseLevel}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select a course level" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Levels</SelectLabel>
+                  <SelectItem value="Beginner">Beginner</SelectItem>
+                  <SelectItem value="Medium">Medium</SelectItem>
+                  <SelectItem value="Advanced">Advanced</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        <div>
+          <Label>Price in INR</Label>
+          <Input
+            type="number"
+            name="coursePrice"
+            value={input.coursePrice}
+            onChange={changeEventHandler}
+            placeholder="Ex. 199"
+          />
+        </div>
+        <div>
+          <Label>Course Thumbnail</Label>
+          <Input type="file" onChange={selectThumbnail} accept="image/*" />
+          {previewThumbnail && (
+            <img
+              src={previewThumbnail}
+              className="mt-2 max-w-[200px] rounded-md"
+              alt="Course Thumbnail"
             />
-          </div>
-          <div>
-            <Label>Subtitle</Label>
-            <Input
-              type="text"
-              name="subTitle"
-              value={input.subTitle}
-              onChange={changeEventHandler}
-              placeholder="Ex. Become a Fullstack developer from zero to hero in 2 months"
-            />
-          </div>
-          <div>
-            <Label>Description</Label>
-            <RichTextEditor input={input} setInput={setInput} />
-          </div>
-          <div className="flex items-center gap-5">
-            <div>
-              <Label>Category</Label>
-              <Select
-                defaultValue={input.category}
-                onValueChange={selectCategory}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select a category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Category</SelectLabel>
-                    <SelectItem value="Next JS">Next JS</SelectItem>
-                    <SelectItem value="Data Science">Data Science</SelectItem>
-                    <SelectItem value="Frontend Development">
-                      Frontend Development
-                    </SelectItem>
-                    <SelectItem value="Fullstack Development">
-                      Fullstack Development
-                    </SelectItem>
-                    <SelectItem value="MERN Stack Development">
-                      MERN Stack Development
-                    </SelectItem>
-                    <SelectItem value="Javascript">Javascript</SelectItem>
-                    <SelectItem value="Python">Python</SelectItem>
-                    <SelectItem value="Docker">Docker</SelectItem>
-                    <SelectItem value="MongoDB">MongoDB</SelectItem>
-                    <SelectItem value="HTML">HTML</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>Course Level</Label>
-              <Select
-                defaultValue={input.courseLevel}
-                onValueChange={selectCourseLevel}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select a course level" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Course Level</SelectLabel>
-                    <SelectItem value="Beginner">Beginner</SelectItem>
-                    <SelectItem value="Medium">Medium</SelectItem>
-                    <SelectItem value="Advance">Advance</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>Price in (INR)</Label>
-              <Input
-                type="number"
-                name="coursePrice"
-                value={input.coursePrice}
-                onChange={changeEventHandler}
-                placeholder="199"
-                className="w-fit"
-              />
-            </div>
-          </div>
-          <div>
-            <Label>Course Thumbnail</Label>
-            <Input
-              type="file"
-              onChange={selectThumbnail}
-              accept="image/*"
-              className="w-fit"
-            />
-            {previewThumbnail && (
-              <img
-                src={previewThumbnail}
-                className="e-64 my-2"
-                alt="Course Thumbnail"
-              />
-            )}
-          </div>
-          <div>
-            <Button onClick={() => navigate("/admin/course")} variant="outline">
-              Cancel
-            </Button>
-            <Button disabled={false} onClick={updateCourseHandler}>
-              Save
-            </Button>
-          </div>
+          )}
+        </div>
+        <div className="flex gap-4 mt-6">
+          <Button onClick={() => navigate("/admin/course")} variant="outline">
+            Cancel
+          </Button>
+          <Button
+            onClick={updateCourseHandler}
+            className="bg-blue-500 text-white"
+          >
+            Save
+          </Button>
         </div>
       </CardContent>
     </Card>
   );
 };
-
 export default CourseTab;
+

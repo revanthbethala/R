@@ -4,10 +4,38 @@ import { Menu, X } from "lucide-react";
 import Logo from "./Logo";
 import { UserButton, useUser } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
+import axios from "axios";
 function NavBar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
   const { isSignedIn } = useUser();
   const navigate = useNavigate();
+  const [selectedRole, setSelectedRole] = useState(
+    localStorage.getItem("role")
+  );
+  const { user } = useUser();
+  const userId = user?.id;
+  const instructorFirstVisit = localStorage.getItem("instructorFirstVisit");
+  const handleRoleChange = async (event) => {
+    const role: string = event.target.value;
+    setSelectedRole(role);
+    localStorage.setItem("role", role);
+    if (role === "instructor") {
+      if (instructorFirstVisit === "true") navigate("/instructor/addCourse");
+      else navigate("/instructor");
+    }
+    if (role === "student") navigate("/");
+    if (role === "recruiter") navigate("/jobs");
+    const req = await axios.put(
+      "http://localhost:8000/api/v1/user/changeRole",
+      JSON.stringify({ role: event.target.value, userId }),
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    console.log(req);
+  };
   return (
     <div className="">
       <header className="items-center">
@@ -37,27 +65,42 @@ function NavBar() {
           </ul>
 
           {/* Sign Up/Sign In Buttons */}
-          <div className="hidden md:flex  space-x-4 ">
-            <button
-              onClick={() =>
-                isSignedIn ? navigate("/dashboard") : navigate("/signup")
-              }
-              className={`${
-                isSignedIn
-                  ? "font-semibold text-lg font-Inter cursor-pointer  p-2"
-                  : "bg-blue-700 text-white   font-semibold px-4 py-2  w-fit text-lg rounded-lg"
-              }  font-family-poppins `}
-            >
-              {isSignedIn ? "Dashboard" : "Login/Sign Up"}
-            </button>
+          <div className="hidden md:flex md:  space-x-4 ">
+            <div className="md:flex gap-4">
+              <NavLink
+                to={
+                  selectedRole === "instructor"
+                    ? `/instructor/dashboard`
+                    : selectedRole === "recruiter"
+                    ? "/recruiter/dashboard"
+                    : "dashboard"
+                }
+              >
+                <Button className="px-4 py-2 rounded-md text-white bg-blue-500 hover:bg-blue-600">
+                  My Dashboard
+                </Button>
+              </NavLink>
+              {!isSignedIn && (
+                <Button onClick={() => navigate("/signup")}>
+                  Login/Sign Up
+                </Button>
+              )}
+            </div>
+
             {isSignedIn && (
-              <select className="p-2 outline-none font-semibold text-base">
-                <option value="">Switch Roles</option>
+              <select
+                className="font-semibold font-Inter cursor-pointer"
+                onChange={handleRoleChange}
+              >
+                <option value="" className="text-base ">
+                  Switch Roles
+                </option>
                 <option value="student">Student</option>
                 <option value="instructor">Instructor</option>
                 <option value="recruiter">Recruiter</option>
               </select>
             )}
+
             {isSignedIn && <UserButton />}
           </div>
 

@@ -13,7 +13,6 @@ export const getUser = async (req, res) => {
     } else {
       user = new User({ userId, fullName, email, profilePic, isSignedIn });
     }
-
     await user.save();
     res.status(200).json({ message: "User synced successfully", user });
   } catch (error) {

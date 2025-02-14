@@ -26,8 +26,8 @@ const JobDetails = () => {
   const { user } = useUser();
   if (error || !data)
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-100">
-        <p className="text-center text-red-500 font-medium text-lg bg-white p-6 rounded-lg shadow-lg">
+      <div className="flex items-center justify-center h-screen ">
+        <p className="text-center text-red-500 font-medium text-lg p-6 rounded-lg shadow-lg">
           Error loading job details.
         </p>
       </div>
@@ -41,7 +41,7 @@ const JobDetails = () => {
     try {
       const res = await axios.post(
         `http://localhost:8000/api/v1/application/apply/${job._id}`,
-        JSON.stringify({ applicant: user?.id }),
+        JSON.stringify({ userId: user?.id }),
         {
           headers: {
             "Content-Type": "application/json",
