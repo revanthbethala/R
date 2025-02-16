@@ -1,16 +1,16 @@
-import React, { useEffect } from "react";
+import { useUser } from "@clerk/clerk-react";
 import { useNavigate } from "react-router";
 
 function ProtectedRoute({ children }) {
   const navigate = useNavigate();
-  const isAuthorized = true;
-  useEffect(() => {
-    if (!isAuthorized) {
-      navigate("/tests"); // Redirect to home if not authorized
-    }
-  }, [isAuthorized, navigate]);
+  const { isSignedIn } = useUser();
 
-  return <>{isAuthorized ? children : null}</>;
+  if (!isSignedIn) {
+    navigate("/login"); // Redirect to login if not signed in
+    return null; // Don't render children if not signed in
+  }
+
+  return <>{children}</>; // Render children if signed in
 }
 
 export default ProtectedRoute;

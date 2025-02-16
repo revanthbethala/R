@@ -21,8 +21,18 @@ import Compiler from "./pages/Compiler";
 import Course from "./Courses/Course";
 import Jobs from "./pages/Jobs";
 import JobCards from "./Jobs/JobCards";
-import Dashboard from "./admin/Dashboard";
-
+import Dashboard from "./pages/Dashboard";
+import JobDetails from "./Jobs/JobDetails";
+import ProtectedRoute from "./pages/ProtectedRoute";
+import InstructorForm from "./Instructor/InstructorForm";
+import AddCourse from "./admin/course/AddCourse";
+import EditCourse from "./admin/course/EditCourse";
+import InstructorDashboard from "./Instructor/InstructorDashboard";
+import RecruiterDashboard from "./Recruiter/RecruiterDashboard";
+import CreateLecture from "./admin/lecture/CreateLecture";
+import EditLecture from "./admin/lecture/EditLecture";
+import { ToastContainer } from "react-toastify"; // Import ToastContainer
+import "react-toastify/dist/ReactToastify.css";
 const Layout = () => (
   <>
     <NavBar />
@@ -39,7 +49,11 @@ function App() {
         { path: "", element: <Home /> },
         {
           path: "assessments",
-          element: <Assessments />,
+          element: (
+            <ProtectedRoute>
+              <Assessments />
+            </ProtectedRoute>
+          ),
           children: [
             {
               path: "",
@@ -57,7 +71,11 @@ function App() {
         },
         {
           path: "mockInterview",
-          element: <MockInterview />,
+          element: (
+            <ProtectedRoute>
+              <MockInterview />
+            </ProtectedRoute>
+          ),
           children: [
             {
               path: "",
@@ -75,7 +93,11 @@ function App() {
         },
         {
           path: "courses",
-          element: <Courses />,
+          element: (
+            <ProtectedRoute>
+              <Courses />
+            </ProtectedRoute>
+          ),
           children: [
             { path: "", element: <Course /> },
             {
@@ -90,24 +112,75 @@ function App() {
         },
         {
           path: "jobs",
-          element: <Jobs />,
+          element: (
+            <ProtectedRoute>
+              <Jobs />
+            </ProtectedRoute>
+          ),
           children: [
             {
               path: "",
               element: <JobCards />,
             },
+            {
+              path: "job-detail/:id",
+              element: <JobDetails />,
+            },
           ],
         },
         {
           path: "dashboard",
-          element: <Dashboard />,
+          element: (
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          ),
         },
+
         {
           path: "/compiler",
-          element: <Compiler />,
+          element: (
+            <ProtectedRoute>
+              <Compiler />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "instructor",
+          children: [
+            {
+              path: "",
+              element: <InstructorForm />,
+            },
+            {
+              path: "dashboard",
+              element: <InstructorDashboard />,
+            },
+            {
+              path: "addCourse",
+              element: <AddCourse />,
+            },
+            {
+              path: "course/:id",
+              element: <EditCourse />,
+            },
+            {
+              path: "course/:id/lecture",
+              element: <CreateLecture />,
+            },
+            {
+              path: "course/:id/lecture/:lectureId",
+              element: <EditLecture />,
+            },
+          ],
+        },
+        {
+          path: "recruiter",
+          children: [{ path: "dashboard", element: <RecruiterDashboard /> }],
         },
       ],
     },
+
     { path: "login", element: <Login /> },
     { path: "signup", element: <Signup /> },
     { path: "/user-preferences", element: <UserPreferences /> },
@@ -116,6 +189,7 @@ function App() {
   return (
     <Suspense fallback={<Loading />}>
       <RouterProvider router={router} />
+      <ToastContainer />
     </Suspense>
   );
 }

@@ -46,7 +46,7 @@ export const editCourse = async (req, res) => {
     const course = await Course.findById(courseId);
     if (!course) return res.status(404).json({ message: "Course not found" });
     console.log("Course found", course);
-    let courseThumbnail = course.courseThumbnail; 
+    let courseThumbnail = course.courseThumbnail;
 
     if (req.file) {
       const fileUri = getDataUri(req.file);
@@ -67,7 +67,7 @@ export const editCourse = async (req, res) => {
         description,
         courseLevel,
         coursePrice,
-        courseThumbnail:courseThumbnail.url,
+        courseThumbnail: courseThumbnail.url,
         isPublished,
       },
       { new: true }
