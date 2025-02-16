@@ -95,9 +95,6 @@ export const getJobById = async(req,res)=>{
         console.log(error)
     }
     return res.status(200).json({ job, success: true });
-  } catch (error) {
-    console.log(error);
-  }
 };
 
 export const getAdminJobs = async (req, res) => {
