@@ -4,8 +4,7 @@ import useGet from "@/myComponents/useGet";
 import { CheckCircle2, CirclePlay } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 
 interface Lecture {
   _id: string;
@@ -27,9 +26,14 @@ const CourseProgress = () => {
   const [completedLectures, setCompletedLectures] = useState<string[]>([]);
 
   useEffect(() => {
-    if (data) {
+    if (
+      data &&
+      data.lectures &&
+      Array.isArray(data.lectures) &&
+      data.lectures.length > 0
+    ) {
       setCourseData({ courseTitle: data.courseTitle, lectures: data.lectures });
-      setCurrentLecture(data.lectures[0] || null);
+      setCurrentLecture(data.lectures[0]);
     }
   }, [data]);
 
@@ -55,24 +59,13 @@ const CourseProgress = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-4 space-y-6">
-      <ToastContainer
-        position="bottom-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
-
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
         <h1 className="text-3xl font-bold mb-2 sm:mb-0">
-          {courseData?.courseTitle}
+          {courseData?.courseTitle || "Course"}
         </h1>
         <Badge variant="outline" className="text-sm">
-          {completedLectures.length} / {courseData?.lectures.length} Completed
+          {completedLectures.length} / {courseData?.lectures?.length || 0}{" "}
+          Completed
         </Badge>
       </div>
 
@@ -104,7 +97,7 @@ const CourseProgress = () => {
         <div className="space-y-4">
           <h2 className="font-semibold text-2xl mb-4">Course Lectures</h2>
           <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2">
-            {courseData?.lectures.map((lecture, index) => (
+            {courseData?.lectures?.map((lecture, index) => (
               <Card
                 key={lecture._id}
                 className={`hover:bg-gray-50 transition-colors cursor-pointer ${
@@ -121,9 +114,9 @@ const CourseProgress = () => {
                     )}
                   </div>
                   <div className="flex-grow">
-                    <CardTitle className="text-sm font-medium">{`${
-                      index + 1
-                    }. ${lecture.lectureTitle}`}</CardTitle>
+                    <CardTitle className="text-sm font-medium">
+                      {`${index + 1}. ${lecture.lectureTitle}`}
+                    </CardTitle>
                   </div>
                   {completedLectures.includes(lecture._id) && (
                     <Badge

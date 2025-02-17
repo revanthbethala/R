@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -13,8 +13,10 @@ import {
 } from "@/components/ui/select";
 import RichTextEditor from "@/myComponents/RichTextEditor";
 import axios from "axios";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 
 interface CourseInput {
   courseTitle: string;
@@ -43,7 +45,7 @@ const CourseTab = () => {
   const courseId = params.id as string;
   const [previewThumbnail, setPreviewThumbnail] = useState<string>("");
   const navigate = useNavigate();
-
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   // Change input handler
   const changeEventHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -91,7 +93,7 @@ const CourseTab = () => {
       if (input.courseThumbnail instanceof File) {
         formData.append("courseThumbnail", input.courseThumbnail);
       }
-
+      setIsLoading(true);
       const res = await axios.put(
         `http://localhost:8000/api/v1/courses/edit/${courseId}`,
         formData,
@@ -103,8 +105,12 @@ const CourseTab = () => {
         }
       );
       console.log("Course updated:", res.data);
+      toast.success("Course updated successfully!");
     } catch (err) {
+      toast.error("Error updating course");
       console.error("Error updating course:", err);
+    } finally {
+      setIsLoading(false);
     }
   };
   const isFormComplete = () => {
@@ -122,27 +128,6 @@ const CourseTab = () => {
 
   return (
     <Card className="shadow-lg rounded-lg p-6 bg-white border border-gray-200">
-      <CardHeader className="flex flex-row justify-between items-center">
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            onClick={togglePublishStatus}
-            disabled={!isFormComplete()}
-            className={`px-4 py-2 rounded-md border ${
-              isFormComplete()
-                ? "border-blue-500 hover:bg-blue-50"
-                : "border-gray-300 cursor-not-allowed opacity-50"
-            } focus:ring-2 focus:ring-blue-400`}
-            title={
-              !isFormComplete()
-                ? "Please fill all fields before publishing"
-                : ""
-            }
-          >
-            {input.isPublished ? "Unpublish" : "Publish"}
-          </Button>
-        </div>
-      </CardHeader>
       <CardContent className="mt-6 space-y-6">
         <div>
           <Label>Title</Label>
@@ -236,14 +221,34 @@ const CourseTab = () => {
             />
           )}
         </div>
+        <div className="space-x-2">
+          <Button
+            variant="outline"
+            onClick={togglePublishStatus}
+            disabled={!isFormComplete()}
+            className={`px-4 py-2 rounded-md border ${
+              isFormComplete()
+                ? "border-blue-500 hover:bg-blue-50"
+                : "border-gray-300 cursor-not-allowed opacity-50"
+            } focus:ring-2 focus:ring-blue-400`}
+            title={
+              !isFormComplete()
+                ? "Please fill all fields before publishing"
+                : ""
+            }
+          >
+            {input.isPublished ? "Unpublish Course" : "Publish Course"}
+          </Button>
+        </div>
         <div className="flex gap-4 mt-6">
           <Button onClick={() => navigate("/admin/course")} variant="outline">
             Cancel
           </Button>
           <Button
             onClick={updateCourseHandler}
-            className="bg-blue-500 text-white"
+            className="bg-blue-500 hover:bg-blue-700 text-white"
           >
+            {isLoading && <Loader2 className="animate-spin" />}
             Save
           </Button>
         </div>
@@ -252,4 +257,3 @@ const CourseTab = () => {
   );
 };
 export default CourseTab;
-
