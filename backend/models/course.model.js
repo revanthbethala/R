@@ -21,6 +21,7 @@ const courseSchema = new mongoose.Schema({
     courseThumbnail:{
         type:String
     },
+    rating: { type: Number,min: 1, max: 5 },
     enrolledStudents:[
         {
             type:mongoose.Schema.Types.ObjectId,

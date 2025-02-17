@@ -130,6 +130,7 @@ export const getCourseById = async (req, res) => {
   }
 };
 
+
 //Lectures controllers
 
 export const createLecture = async (req, res) => {
