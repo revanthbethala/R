@@ -34,7 +34,7 @@ const InstructorInfo = () => {
       text: "Working with He on our group projects was a game changer. His coding skills and creativity brought our ideas to life.",
     },
     {
-      name: "Bethala Revanth",
+      name: "Lohit",
       position: "Fellow Developer",
       text: "He is a talented developer. His work on our mobile app showcased his skill in delivering user-friendly designs.",
     },

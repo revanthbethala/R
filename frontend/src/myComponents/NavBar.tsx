@@ -71,21 +71,21 @@ function NavBar() {
           {/* Sign Up/Sign In Buttons */}
           <div className="hidden md:flex md:  space-x-4 ">
             <div className="md:flex gap-4">
-              <NavLink
+              {isSignedIn && <NavLink
                 to={
                   selectedRole === "instructor"
                     ? `/instructor/dashboard`
                     : selectedRole === "recruiter"
-                    ? "/recruiter/dashboard"
-                    : "dashboard"
+                      ? "/recruiter/dashboard"
+                      : "dashboard"
                 }
               >
                 <Button className="px-4 py-2 rounded-md text-white bg-blue-500 hover:bg-blue-600">
                   My Dashboard
                 </Button>
-              </NavLink>
+              </NavLink>}
               {!isSignedIn && (
-                <Button onClick={() => navigate("/signup")}>
+                <Button onClick={() => navigate("/signup")} className="bg-blue-700 font-semibold font-Inter tracking-wide hover:bg-blue-800">
                   Login/Sign Up
                 </Button>
               )}
@@ -151,11 +151,10 @@ function NavBar() {
                 onClick={() =>
                   isSignedIn ? navigate("/dashboard") : navigate("/signup")
                 }
-                className={`${
-                  isSignedIn
+                className={`${isSignedIn
                     ? "font-semibold text-lg font-Inter cursor-pointer  p-2"
                     : "bg-blue-700 text-white   font-semibold px-4 py-2  w-fit text-lg rounded-lg"
-                }  font-family-poppins `}
+                  }  font-family-poppins `}
               >
                 {isSignedIn ? "Dashboard" : "Login/Sign Up"}
               </button>

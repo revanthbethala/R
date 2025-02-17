@@ -21,9 +21,8 @@ function AssessmentInstructions() {
     testDuration,
     noOfQuestions,
   };
-
+console.log(userId);
   async function PostData() {
-    console.log("clicked button",sendData)
     const res = await axios.post(
       "http://localhost:8000/api/v1/tests/store",
       JSON.stringify(sendData),
@@ -34,10 +33,7 @@ function AssessmentInstructions() {
         withCredentials: true,
       }
     );
-    const id = res.data.userId;
-
-    console.log("userid", id);
-    console.log("Form Submitted:", res);
+    const id = res?.data?.test?.userId;
     navigate(`/assessments/start/${id}`);
   }
 

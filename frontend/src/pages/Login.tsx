@@ -1,25 +1,39 @@
 import Logo from "@/myComponents/Logo";
 import { SignIn } from "@clerk/clerk-react";
+import { motion } from "framer-motion";
 
 function Login() {
   return (
-    <section className="h-screen px-6 bg-gradient-to-bl from-blue-200 via-sky-500 to-gray-200">
-      <div className="flex justify-center pb-16">
+    <motion.section
+      className="flex flex-col items-center justify-center min-h-screen bg-gray-100"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <div className="flex justify-center pb-8">
         <Logo />
       </div>
-      <div className="flex items-center justify-center lg:justify-around  ">
-        <div className="w-1/2 h-1/2 flex items-center justify-center">
+      <div className="flex items-center justify-center w-full lg:justify-around space-x-8">
+        <motion.div
+          initial={{ x: -100 }}
+          animate={{ x: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           <img
-            src="src/assets/loginImg.jpg"
+            src="src/assets/loginImage.png"
             alt="login"
-            className="w-fit h-fit"
+            className="rounded shadow-sm"
           />
-        </div>
-        <div>
+        </motion.div>
+        <motion.div
+          initial={{ x: 100 }}
+          animate={{ x: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           <SignIn signUpUrl="/signup" forceRedirectUrl="/" />
-        </div>
+        </motion.div>
       </div>
-    </section>
+    </motion.section>
   );
 }
 
