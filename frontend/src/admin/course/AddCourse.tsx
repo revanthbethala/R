@@ -15,6 +15,7 @@ import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { toast } from "react-toastify";
 
 const AddCourse = () => {
   const [courseTitle, setCourseTitle] = useState("");
@@ -47,9 +48,11 @@ const AddCourse = () => {
       );
       const id = res?.data?.course?._id;
       console.log(id);
+      toast.success("Course created successfully!");
       navigate(`/instructor/course/${id}`);
     } catch (err) {
       console.log("error", err);
+      toast.error("Failed to create course");
     }
   };
 

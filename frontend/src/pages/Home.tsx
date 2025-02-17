@@ -13,7 +13,7 @@ import {
   FacebookIcon,
 } from "lucide-react";
 import { NavLink } from "react-router";
-import { categories, hero, jobs, resume } from "../data";
+import { categories, hero, jobs, jobsImg, resume } from "../data";
 import { useUser } from "@clerk/clerk-react";
 import { useEffect } from "react";
 
@@ -99,45 +99,28 @@ function Categories() {
           <ArrowRightIcon size={15} className="font-bold" />
         </NavLink>
       </div>
-
-      {/* Find Jobs & Internships Section */}
-      <div className="px-4 md:px-16">
-        <h3 className=" text-3xl md:text-4xl text-center font-bold font-Inter tracking-wide m-8">
-          Find Jobs & Internships
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 py-12 px-9">
-          {jobs.map((job, index) => (
-            <div
-              key={index}
-              className="flex-col gap-2 flex bg-white p-4 rounded-lg shadow-lg"
-            >
-              <h3 className="text-xl font-bold font-Inter mb-2 flex items-center">
-                <Briefcase className="mr-2" size={16} />
-                {job.jobRole}
-              </h3>
-              <p className="flex items-center text-gray-700 mb-2">
-                <Info className="mr-2" size={16} />
-                {job.companyName}
-              </p>
-              <p className="flex items-center text-gray-600 mb-2">
-                <Calendar className="mr-2" size={16} />
-                {job.workType}
-              </p>
-              <p className="flex items-center text-gray-600">
-                <MapPin className="mr-2" size={16} />
-                {job.location}
-              </p>
-              <NavLink
-                to="jobs"
-                className="w-fit text-base font-Inter bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded-md cursor-pointer mt-1"
-              >
-                Apply Now
-              </NavLink>
-            </div>
-          ))}
+      <div className="flex md:flex-row flex-col justify-evenly md:px-20 p-4 items-center md:gap-36 gap-5">
+        <div>
+          <img src={jobsImg} alt="jobs" className="w-full max-w-md" />
+        </div>
+        <div className="space-y-4 p-4 flex flex-col gap-2 font-Inter  md:w-1/2">
+          <h3 className="font-bold text-2xl md:text-3xl tracking-wide ">
+            Find your Jobs & Internships
+          </h3>
+          <p className="font-medium tracking-wide text-sm md:text-lg leading-relaxed ">
+            Discover top jobs and internships tailored for students and
+            professionals in India. Boost your career with AI-powered resume
+            analysis, mock interviews, and skill tests. Apply seamlessly and
+            unlock new opportunities with curated job listings.
+          </p>
+          <NavLink
+            to="jobs"
+            className="rounded-lg cursor-pointer w-fit text-white bg-blue-600 p-2 text-base font-semibold flex justify-center items-center gap-2"
+          >
+            Apply for Jobs
+          </NavLink>
         </div>
       </div>
-
       {/* Why Choose Us Section */}
       <div className="px-4 md:px-8 flex justify-center flex-col items-center">
         <h3 className="md:text-4xl text-3xl text-center font-bold font-Inter tracking-wide m-8">

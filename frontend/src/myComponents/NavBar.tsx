@@ -62,6 +62,9 @@ function NavBar() {
             <NavLink to="compiler">
               <li className="li-style">Compiler</li>
             </NavLink>
+            <NavLink to="resume-builder">
+              <li className="li-style">Resume Builder</li>
+            </NavLink>
           </ul>
 
           {/* Sign Up/Sign In Buttons */}

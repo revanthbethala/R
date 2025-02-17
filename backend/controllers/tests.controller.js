@@ -4,7 +4,7 @@ import User from "../models/user.model.js";
 export const storetestDetails = async (req, res) => {
   try {
     const { userId,category, difficultyLevel, testDuration, noOfQuestions } = req.body;
-    console.log(userId)
+    // console.log(userId)
     const user = await User.findOne({ userId });
     if (!user) {
       return res.status(404).json({ message: "User not found" });

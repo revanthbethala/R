@@ -33,6 +33,7 @@ import CreateLecture from "./admin/lecture/CreateLecture";
 import EditLecture from "./admin/lecture/EditLecture";
 import { ToastContainer } from "react-toastify"; // Import ToastContainer
 import "react-toastify/dist/ReactToastify.css";
+import Resume from "./pages/Resume";
 const Layout = () => (
   <>
     <NavBar />
@@ -47,6 +48,10 @@ function App() {
       element: <Layout />,
       children: [
         { path: "", element: <Home /> },
+        {
+          path: "resume-builder",
+          element: <Resume />,
+        },
         {
           path: "assessments",
           element: (
@@ -86,7 +91,7 @@ function App() {
               element: <MockInterviewInstructions />,
             },
             {
-              path: "mockInterview/start",
+              path: "start/:id",
               element: <MockInterviewQuestions />,
             },
           ],
