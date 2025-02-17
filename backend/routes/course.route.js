@@ -30,4 +30,5 @@ router
 router.route("/:courseId/lecture/:lectureId").delete(removeLecture);
 router.route("/lecture/:lectureId").get(getLectureById);
 
+
 export default router;
