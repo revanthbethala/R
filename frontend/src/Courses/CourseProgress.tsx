@@ -1,7 +1,10 @@
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import useGet from "@/myComponents/useGet";
-import { CheckCircle2, CirclePlay } from "lucide-react";
+import { sum } from "@tensorflow/tfjs";
+import axios from "axios";
+import { CheckCircle2, CirclePlay, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router";
 import { toast } from "react-toastify";
@@ -20,11 +23,12 @@ interface CourseData {
 const CourseProgress = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const { data, isLoading, error } = useGet(`courses/${courseId}/lectures`);
-
   const [courseData, setCourseData] = useState<CourseData | null>(null);
   const [currentLecture, setCurrentLecture] = useState<Lecture | null>(null);
   const [completedLectures, setCompletedLectures] = useState<string[]>([]);
-
+  const [summary, setSummary] = useState("");
+  const [transciption, setTranscription] = useState("");
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     if (
       data &&
@@ -49,6 +53,33 @@ const CourseProgress = () => {
     if (!completedLectures.includes(lecture._id)) {
       handleLectureProgress(lecture._id);
     }
+  };
+  const handleSummarize = () => {
+    async function PostTestScore() {
+      try {
+        setLoading(true);
+
+        const res = await axios.post(
+          "http://127.0.0.1:5000/transcribe",
+          JSON.stringify({ video_url: currentLecture?.videoUrl }),
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        console.log(res);
+        setSummary(res.data.summary);
+        setTranscription(res.data.transcription);
+      } catch (error) {
+        console.error("Error summarizing video:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    PostTestScore();
   };
 
   if (isLoading) return <p className="text-center p-4">Loading...</p>;
@@ -89,6 +120,33 @@ const CourseProgress = () => {
                     ) ?? -1) + 1
                   } : ${currentLecture.lectureTitle}`}
                 </h3>
+                <br />
+                <Button onClick={handleSummarize}>
+                  {loading ? (
+                    <>
+                      <Loader2 className="animate-spin" /> Summarizing...
+                    </>
+                  ) : (
+                    "Summarize Video"
+                  )}
+                </Button>
+
+                {summary && (
+                  <div className="flex flex-col gap-2 mt-3">
+                    <p className="leading-loose tracking-wide font-Inter">
+                      <strong>
+                        Transcription: <br />
+                      </strong>
+                      {transciption}
+                    </p>
+                    <p className="leading-loose tracking-wide font-Inter">
+                      <strong>
+                        Summary: <br />
+                      </strong>
+                      {summary}
+                    </p>
+                  </div>
+                )}
               </div>
             </>
           )}
