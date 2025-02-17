@@ -17,14 +17,20 @@ import {
   Users,
   Calendar,
   Clock,
+  Star,
 } from "lucide-react";
 import ReactPlayer from "react-player";
+import React, { useState } from "react";
+import Rating from "react-rating";
+import axios from "axios"; 
 
 const CourseDetails = () => {
   const params = useParams();
   const courseId = params.id;
   const navigate = useNavigate();
-  const { data: res, isLoading, error } = useGet(`courses/${courseId}`);
+  const { data: res, isLoading, error, refetch } = useGet(`courses/${courseId}`);
+  const [userRating, setUserRating] = useState(0); 
+  const [userReview, setUserReview] = useState(""); 
 
   if (isLoading) return <Loading />;
   if (error)
@@ -34,9 +40,33 @@ const CourseDetails = () => {
 
   const { course } = res || {};
   const lectures = course?.lectures || [];
+  const reviews = course?.reviews || [];
+  const averageRating = course?.averageRating || 0;
+  const totalRatings = course?.totalRatings || 0;
 
   const handleContinueCourse = () => {
     navigate(`../course-progress/${courseId}`);
+  };
+
+  // Function to post rating and review to the backend
+  const handleSubmitRating = async () => {
+    try {
+      const response = await axios.post(`http://127.0.0.1:8000/api/v1/courseRating/rate-course`, {
+        courseId:courseId,
+        
+        rating: userRating,
+        review: userReview,
+      });
+      if (response.data.success) {
+        alert("Thank you for your review!");
+        refetch();
+        setUserRating(0); 
+        setUserReview(""); 
+      }
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      alert("Failed to submit review. Please try again.");
+    }
   };
 
   return (
@@ -57,6 +87,10 @@ const CourseDetails = () => {
             <p className="flex items-center">
               <Calendar className="mr-2 h-4 w-4" />
               Created by {course?.creator?.fullName || "Unknown"}
+            </p>
+            <p className="flex items-center">
+              <Star className="mr-2 h-4 w-4" />
+              {averageRating.toFixed(1)} ({totalRatings} ratings)
             </p>
           </div>
         </div>
@@ -106,6 +140,30 @@ const CourseDetails = () => {
                 ))}
               </CardContent>
             </Card>
+
+            {/* Reviews Section */}
+            <Card className="mt-8">
+              <CardHeader>
+                <CardTitle>Reviews</CardTitle>
+                <CardDescription>
+                  {reviews.length} reviews (Average Rating: {averageRating.toFixed(1)})
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {reviews.map((review, idx) => (
+                  <div key={idx} className="p-4 bg-gray-50 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Star className="h-4 w-4 text-yellow-400" />
+                      <span className="font-medium">{review.rating}</span>
+                      <span className="text-sm text-gray-500">
+                        by {review.user?.fullName || "Anonymous"}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-700">{review.comment}</p>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
           </div>
 
           <div className="mt-8 lg:mt-0">
@@ -128,6 +186,38 @@ const CourseDetails = () => {
                 <h2 className="text-2xl font-bold mb-4">
                   ₹{course?.coursePrice}
                 </h2>
+
+                {/* Star Rating Field */}
+                <div className="mb-4">
+                  <p className="text-sm font-medium mb-2">Rate this course:</p>
+                  <Rating
+                    initialRating={userRating}
+                    onChange={(value) => setUserRating(value)}
+                    emptySymbol={<Star className="h-5 w-5 text-gray-300" />}
+                    fullSymbol={<Star className="h-5 w-5 text-yellow-400" />}
+                  />
+                </div>
+
+                {/* Review Textarea */}
+                <div className="mb-4">
+                  <textarea
+                    className="w-full p-2 border rounded-lg"
+                    rows="3"
+                    placeholder="Write a review..."
+                    value={userReview}
+                    onChange={(e) => setUserReview(e.target.value)}
+                  />
+                </div>
+
+                <Button
+                  className="w-full mb-4"
+                  size="lg"
+                  onClick={handleSubmitRating}
+                  variant="default"
+                >
+                  Submit Rating
+                </Button>
+
                 <Button
                   className="w-full mb-4"
                   size="lg"
