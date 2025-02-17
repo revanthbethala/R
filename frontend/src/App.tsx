@@ -35,6 +35,7 @@ import { ToastContainer } from "react-toastify"; // Import ToastContainer
 import "react-toastify/dist/ReactToastify.css";
 import Resume from "./pages/Resume";
 import InstructorInfo from "./Courses/InstructorInfo";
+import RecommendJobs from "./Jobs/RecommendJobs";
 const Layout = () => (
   <>
     <NavBar />
@@ -119,6 +120,10 @@ function App() {
               element: <InstructorInfo />,
             },
           ],
+        },
+        {
+          path: "test",
+          element: <RecommendJobs />
         },
         {
           path: "jobs",

@@ -10,6 +10,7 @@ import {
   editLecture,
   removeLecture,
   getLectureById,
+  getUserCourses,
 } from "../controllers/course.controller.js";
 // import multer from "multer";
 import upload from "../middlewares/multer.js";
@@ -21,7 +22,7 @@ router
 router.route("/published").get(getPublishedCourses);
 router.route("/creator/:id").get(getCreatorCourses);
 router.route("/:courseId").get(getCourseById);
-// router.route("/allCourses").get(getAllCourses);
+router.route("/userCourses").get(getUserCourses);
 router.route("/:courseId/lecture").post(createLecture);
 router.route("/:courseId/lectures").get(getCourseLectures);
 router

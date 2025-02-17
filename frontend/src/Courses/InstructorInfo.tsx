@@ -1,5 +1,4 @@
 import useGet from "@/myComponents/useGet";
-import { div } from "@tensorflow/tfjs";
 import { useParams } from "react-router";
 
 const InstructorInfo = () => {
@@ -18,13 +17,46 @@ const InstructorInfo = () => {
 
   const user = data?.user;
 
+  const testimonials = [
+    {
+      name: "Ch. Murali Krishna",
+      position: "HOD, NRI Institute of Technology",
+      text: "He consistently demonstrates a strong grasp of web and mobile development. His dedication to learning and applying new technologies is impressive.",
+    },
+    {
+      name: "Dr. G. Adi Lakshmi",
+      position: "Professor, NRI Institute of Technology",
+      text: "He has a unique ability to simplify complex concepts. His Python tutoring sessions have greatly benefited his peers.",
+    },
+    {
+      name: "Karri Sripathi Rao",
+      position: "Classmate",
+      text: "Working with He on our group projects was a game changer. His coding skills and creativity brought our ideas to life.",
+    },
+    {
+      name: "Bethala Revanth",
+      position: "Fellow Developer",
+      text: "He is a talented developer. His work on our mobile app showcased his skill in delivering user-friendly designs.",
+    },
+    {
+      name: "Ayyala Hari",
+      position: "Project Partner",
+      text: "He's support and knowledge made our project successful. He is always willing to help and share his expertise.",
+    },
+    {
+      name: "Amrutha",
+      position: "Professor, NRI Institute of Technology",
+      text: "He's enthusiasm for coding is infectious. His projects showcase his ability to blend creativity with technical skills.",
+    },
+  ];
+
   // Function to handle email button click
   const handleMessageClick = () => {
     window.location.href = `mailto:${user?.email}`;
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-8 bg-white shadow-xl rounded-xl border border-gray-200 mt-16 ">
+    <div className="max-w-4xl mx-auto p-8 bg-white shadow-xl rounded-xl border border-gray-200 mt-16">
       <h2 className="text-3xl font-extrabold text-gray-800 mb-6 text-center">
         Instructor Information
       </h2>
@@ -63,6 +95,24 @@ const InstructorInfo = () => {
         >
           Message Instructor
         </button>
+      </div>
+
+      {/* Testimonials Section */}
+      <div className="mt-10">
+        <h3 className="text-2xl font-bold text-gray-800 mb-4">Testimonials</h3>
+        <div className="space-y-6">
+          {testimonials.map((testimonial, index) => (
+            <div
+              key={index}
+              className="p-4 border border-gray-200 rounded-lg shadow-sm bg-gray-50"
+            >
+              <p className="text-gray-700 italic">"{testimonial.text}"</p>
+              <p className="text-sm font-semibold text-gray-800 mt-2">
+                - {testimonial.name}, {testimonial.position}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

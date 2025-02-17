@@ -2,8 +2,13 @@ import useGet from "@/myComponents/useGet"
 import { useUser } from "@clerk/clerk-react"
 
 const RecommendJobs = () => {
-   const { id } = useUser()
-   const { data, error, isLoading } = useGet(`/user/get/${id}`)
+   const { user } = useUser()
+   const id = user?.id
+   const { data, error, isLoading } = useGet(`user/getUserByClerk/${id}`)
+   console.log(data)
+   const courseIds = data?.user?.courses
+   console.log(courseIds[0])
+
    return (
       <div>RecommendJobs</div>
    )

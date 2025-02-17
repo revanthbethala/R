@@ -15,7 +15,6 @@ import {
   Lock,
   PlayCircle,
   Users,
-  Calendar,
   Clock,
   Star,
 } from "lucide-react";
@@ -23,8 +22,11 @@ import ReactPlayer from "react-player";
 import { useState } from "react";
 import Rating from "react-rating";
 import axios from "axios";
+import { useUser } from "@clerk/clerk-react";
 
 const CourseDetails = () => {
+  const { user } = useUser();
+  const userId = user?.id;
   const params = useParams();
   const courseId = params.id;
   const navigate = useNavigate();
@@ -44,21 +46,23 @@ const CourseDetails = () => {
   const averageRating = course?.averageRating || 0;
   const totalRatings = course?.totalRatings || 0;
 
+
+
   const handleContinueCourse = () => {
     navigate(`../course-progress/${courseId}`);
   };
 
   // Function to post rating and review to the backend
   const handleSubmitRating = async () => {
+
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/api/v1/courseRating/rate-course",
-        {
-          courseId: courseId,
-          rating: userRating,
-          review: userReview,
-        }
-      );
+      const response = await axios.post(`http://127.0.0.1:8000/api/v1/courseRating/rate-course`, {
+        courseId: courseId,
+        userId: userId,
+        rating: userRating,
+        review: userReview,
+      });
+      console.log(response)
       if (response.data.success) {
         alert("Thank you for your review!");
         setUserRating(0);
