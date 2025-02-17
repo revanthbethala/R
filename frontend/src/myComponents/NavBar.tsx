@@ -47,12 +47,13 @@ function NavBar() {
             <NavLink to="">
               <li className="li-style">Home</li>
             </NavLink>
+            <NavLink to="assessments">
+              <li className="li-style">Assesments</li>
+            </NavLink>
             <NavLink to="courses">
               <li className="li-style">Courses</li>
             </NavLink>
-            <NavLink to="assessments">
-              <li className="li-style">Assessment</li>
-            </NavLink>
+
             <NavLink to="mockInterview">
               <li className="li-style">Mock Interviews</li>
             </NavLink>

@@ -1,11 +1,7 @@
 import {
   ArrowRightIcon,
-  Briefcase,
-  Calendar,
   CheckCircle,
   FileText,
-  Info,
-  MapPin,
   Terminal,
   Twitter,
   Linkedin,
@@ -13,7 +9,7 @@ import {
   FacebookIcon,
 } from "lucide-react";
 import { NavLink } from "react-router";
-import { categories, hero, jobs, jobsImg, resume } from "../data";
+import { categories, hero, jobsImg, resume } from "../data";
 import { useUser } from "@clerk/clerk-react";
 import { useEffect } from "react";
 
@@ -60,7 +56,7 @@ function Categories() {
             powerful compiler
           </p>
           <NavLink
-            to="tests"
+            to="assessments"
             className="rounded-lg cursor-pointer w-fit text-white bg-blue-600 p-2 text-base font-semibold flex justify-center items-center gap-2"
           >
             Get Started

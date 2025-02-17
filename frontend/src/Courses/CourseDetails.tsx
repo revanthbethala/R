@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { data, NavLink, useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -25,7 +25,6 @@ const CourseDetails = () => {
   const courseId = params.id;
   const navigate = useNavigate();
   const { data: res, isLoading, error } = useGet(`courses/${courseId}`);
-
   if (isLoading) return <Loading />;
   if (error)
     return (
@@ -38,7 +37,6 @@ const CourseDetails = () => {
   const handleContinueCourse = () => {
     navigate(`../course-progress/${courseId}`);
   };
-
   return (
     <div className="bg-gray-50 min-h-screen">
       <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white">
@@ -54,10 +52,13 @@ const CourseDetails = () => {
               <Users className="mr-2 h-4 w-4" />
               {course?.enrolledStudents?.length || 0} students enrolled
             </p>
-            <p className="flex items-center">
+            <NavLink
+              to={`/courses/instructorInfo/${courseId}`}
+              className="flex items-center hover:underline"
+            >
               <Calendar className="mr-2 h-4 w-4" />
               Created by {course?.creator?.fullName || "Unknown"}
-            </p>
+            </NavLink>
           </div>
         </div>
       </div>

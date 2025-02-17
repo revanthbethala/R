@@ -34,6 +34,7 @@ import EditLecture from "./admin/lecture/EditLecture";
 import { ToastContainer } from "react-toastify"; // Import ToastContainer
 import "react-toastify/dist/ReactToastify.css";
 import Resume from "./pages/Resume";
+import InstructorInfo from "./Courses/InstructorInfo";
 const Layout = () => (
   <>
     <NavBar />
@@ -112,6 +113,10 @@ function App() {
             {
               path: "course-progress/:courseId",
               element: <CourseProgress />,
+            },
+            {
+              path: "instructorInfo/:id",
+              element: <InstructorInfo />,
             },
           ],
         },

@@ -27,7 +27,10 @@ interface Course {
 interface CourseCardProps {
   course: Course;
 }
-
+const stripHtml = (html: string) => {
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  return doc.body.textContent || "";
+};
 export const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
   return (
     <motion.div
@@ -55,7 +58,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
               {course.courseTitle}
             </h2>
             <p className="text-sm text-gray-600 line-clamp-2">
-              {course.description}
+              {stripHtml(course.description)}
             </p>
             <div className="flex justify-between items-center text-sm text-gray-500">
               <p>{course.enrolledStudents?.length} students enrolled</p>
