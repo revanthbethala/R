@@ -130,6 +130,21 @@ export const getCourseById = async (req, res) => {
   }
 };
 
+export const getUserCourses = async (req,res)=>{
+  try {
+    const { userId } = req.params;
+    const enrolledCourses = await Course.find({ enrolledStudents: userId });
+
+    if (enrolledCourses.length === 0) {
+      return res.status(200).json({ message: "No enrolled courses found", enrolledCourses: [] });
+    }
+
+    res.status(200).json({ enrolledCourses });
+  } catch (error) {
+    console.error("Error fetching enrolled courses:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+}
 
 //Lectures controllers
 
