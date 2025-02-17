@@ -36,3 +36,17 @@ export const changeRole = async (req, res)=>{
     res.status(500).json({message:"Error changing role",error:error.message})
   }
 }
+
+export const getUserById = async(req,res)=>{
+  try {
+    const { userId } = req.params;
+    let user = await User.findOne({ _id:userId });
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+    } else {
+      res.status(200).json({ user });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching user", error: error.message });
+  }
+}

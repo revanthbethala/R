@@ -40,6 +40,10 @@ const UserSchema = new mongoose.Schema(
       type:Number,
       default:0
     },
+    website:{
+      type:String,
+      unique:true
+    },
     courses: [
       {
         type: mongoose.Schema.Types.ObjectId,

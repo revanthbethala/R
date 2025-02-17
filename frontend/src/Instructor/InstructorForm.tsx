@@ -99,9 +99,8 @@ const InstructorForm = () => {
               name={name}
               value={formData[name]}
               onChange={handleChange}
-              className={`mt-1 block w-full p-3 border ${
-                errors[name] ? "border-red-500" : "border-gray-300"
-              } rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-400 transition-all duration-200`}
+              className={`mt-1 block w-full p-3 border ${errors[name] ? "border-red-500" : "border-gray-300"
+                } rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-400 transition-all duration-200`}
             />
             {errors[name] && (
               <span className="text-sm text-red-500">

@@ -1,23 +1,35 @@
 import { useState } from "react";
 import axios from "axios";
 
+// Define the Job type
+interface Job {
+  id: string;
+  title: string;
+  company?: {
+    name: string;
+  };
+  location?: string;
+  url: string;
+}
+
 const JobScraper = () => {
-  const [jobTitle, setJobTitle] = useState("");
-  const [jobs, setJobs] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [jobTitle, setJobTitle] = useState<string>(""); // Define state type as string
+  const [jobs, setJobs] = useState<Job[]>([]); // Define state type as Job[]
+  const [loading, setLoading] = useState<boolean>(false); // Define state type as boolean
+  const [error, setError] = useState<string>(""); // Define state type as string
 
   const fetchJobs = async () => {
     if (!jobTitle.trim()) return;
     setLoading(true);
-    setError(null);
+    setError("");
     setJobs([]);
     try {
       const response = await axios.get(
         "https://linkedin-data-api.p.rapidapi.com/search-jobs",
         {
           headers: {
-            "x-rapidapi-key": "b227f7b21dmshe5456f4842e2431p157710jsn6d20221d25cc", // Store API key in .env
+            "x-rapidapi-key":
+              "b227f7b21dmshe5456f4842e2431p157710jsn6d20221d25cc", // Store API key in .env
             "x-rapidapi-host": "linkedin-data-api.p.rapidapi.com",
           },
           params: {
@@ -28,7 +40,7 @@ const JobScraper = () => {
         }
       );
       if (!response.data?.data || response.data.data.length === 0) {
-        setError("No jobs found.");
+        setError("No jobs found");
         setJobs([]);
       } else {
         setJobs(response.data.data);
@@ -68,18 +80,18 @@ const JobScraper = () => {
       <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {jobs.map((job) => (
           <div
-            key={job?.id}
+            key={job.id}
             className="p-4 border rounded-lg shadow-md bg-gray-50 hover:shadow-lg transition"
           >
             <h3 className="text-lg font-semibold text-gray-800">
-              {job?.title || "N/A"}
+              {job.title || "N/A"}
             </h3>
             <p className="text-gray-600">
               Company: {job.company?.name || "N/A"}
             </p>
-            <p className="text-gray-600">Location: {job?.location || "N/A"}</p>
+            <p className="text-gray-600">Location: {job.location || "N/A"}</p>
             <a
-              href={job?.url}
+              href={job.url}
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-500 hover:underline mt-2 block"

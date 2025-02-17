@@ -115,7 +115,7 @@ function App() {
               element: <CourseProgress />,
             },
             {
-              path: "instructorInfo/:id",
+              path: ":id/instructorInfo",
               element: <InstructorInfo />,
             },
           ],

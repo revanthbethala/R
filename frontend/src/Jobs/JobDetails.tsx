@@ -20,8 +20,8 @@ const JobDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { data, isLoading, error } = useGet(`job/get/${id}`);
-  if (isLoading) return <Loading />;
   const { user } = useUser();
+  if (isLoading) return <Loading />;
   if (error || !data)
     return (
       <div className="flex items-center justify-center h-screen ">
