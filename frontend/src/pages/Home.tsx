@@ -10,12 +10,14 @@ import {
 } from "lucide-react";
 import { NavLink } from "react-router";
 import { categories, hero, jobsImg, resume } from "../data";
+import { CircleDollarSign } from "lucide-react";
 import { useUser } from "@clerk/clerk-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import axios from "axios";
 function Categories() {
   const { user, isLoaded } = useUser();
+  const [userCoins, setUserCoins] = useState(0);
   const syncUserData = async () => {
     if (user) {
       try {
@@ -36,13 +38,30 @@ function Categories() {
     }
   };
 
+  const fetchUserCoins = async (userId:any) => {
+    try {
+      const response = await axios.get(`http://localhost:8000/api/v1/user/getUserByClerk/${userId}`);
+      console.log(response);
+      console.log(response.data.user.shuriCoins);
+      return response.data.user.shuriCoins;
+    } catch (error) {
+      console.error("Error fetching user coins:", error);
+      return 0; 
+    }
+  };
+
   useEffect(() => {
     if (isLoaded && user) {
       syncUserData();
+      fetchUserCoins(user.id).then((coins:any) => setUserCoins(coins));
     }
   }, [isLoaded, user]);
   return (
     <div className=" w-full my-bg">
+      <div className="flex items-center gap-2 bg-white p-2 rounded-lg shadow-sm border border-gray-200">
+              <CircleDollarSign size={20} className="text-yellow-500" />
+              <span className="text-lg font-bold text-gray-800">{userCoins}</span>
+            </div>
       {/* Hero Section */}
       <div className="flex md:flex-row flex-col-reverse md:px-20 items-center h-[calc(100vh-5rem)] justify-between px-2">
         <div className="space-y-4 p-4 flex flex-col  md:items-start font-Inter md:w-1/2">
@@ -67,6 +86,8 @@ function Categories() {
           <img src={hero} alt="hero_img" className="w-full max-w-md" />
         </div>
       </div>
+
+      
 
       {/* Categories Section */}
       <div className="flex flex-col py-10 px-4">

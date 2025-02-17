@@ -1,9 +1,13 @@
 import express from "express";
-import { initiatePayment, paymentCallback } from "../controllers/coursePurchase.controller.js";
+
+import { createCheckoutSession, getAllPurchasedCourse, getCourseDetailWithPurchaseStatus, shuriPayment, stripeWebhook } from "../controllers/coursePurchase.controller.js";
 
 const router = express.Router();
 
-router.post("/pay", initiatePayment);
-router.post("/callback", paymentCallback);
+router.route("/checkout/create-checkout-session").post( createCheckoutSession);
+router.route("/webhook").post(express.raw({type:"application/json"}), stripeWebhook);
+router.route("/course/:courseId/detail-with-status").get(getCourseDetailWithPurchaseStatus);
+router.route("/shuriPay").post(shuriPayment)
+router.route("/").get(getAllPurchasedCourse);
 
 export default router;

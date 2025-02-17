@@ -18,7 +18,7 @@ export const createCourse = async (req, res) => {
 
     const newCourse = new Course({ courseTitle, category, creator: user._id });
     await newCourse.save();
-
+    console.log(newCourse.type)
     user.courses.push(newCourse);
     await user.save();
 

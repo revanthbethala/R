@@ -1,78 +1,219 @@
-import axios from "axios";
-import crypto from "crypto";
-import dotenv from "dotenv";
-import CoursePurchase from "../models/coursePurchase.model.js";
+import Stripe from "stripe";
+import  Course  from "../models/course.model.js";
+import  CoursePurchase  from "../models/coursePurchase.model.js";
+import Lecture from "../models/lecture.model.js";
+import  User  from "../models/user.model.js";
 
-dotenv.config();
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-const PHONEPE_MERCHANT_ID = process.env.PHONEPE_MERCHANT_ID;
-const PHONEPE_SALT_KEY = process.env.PHONEPE_SALT_KEY;
-const PHONEPE_SALT_INDEX = process.env.PHONEPE_SALT_INDEX;
-const PHONEPE_BASE_URL = process.env.PHONEPE_BASE_URL; 
+export const createCheckoutSession = async (req, res) => {
+  try {
+    const userId = req.id;
+    const { courseId } = req.body;
 
-export const initiatePayment = async (req, res) => {
-    try {
-        const { userId, courseId, amount, mobileNumber } = req.body;
+    const course = await Course.findById(courseId);
+    if (!course) return res.status(404).json({ message: "Course not found!" });
 
-        const transaction = new CoursePurchase({
-            userId,
-            courseId,
-            amount,
-            transactionId: `TXN_${Date.now()}`,
-            status: "PENDING",
-        });
+    const newPurchase = new CoursePurchase({
+      courseId,
+      userId,
+      amount: course.coursePrice,
+      status: "pending",
+    });
 
-        await transaction.save();
-
-        const payload = {
-            merchantId: PHONEPE_MERCHANT_ID,
-            transactionId: transaction.transactionId,
-            amount: amount * 100, 
-            currency: "INR",
-            redirectUrl: `${process.env.BASE_URL}/api/payment/success`,
-            callbackUrl: `${process.env.BASE_URL}/api/payment/callback`,
-            mobileNumber,
-            paymentInstrument: {
-                type: "UPI_INTENT",
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price_data: {
+            currency: "inr",
+            product_data: {
+              name: course.courseTitle,
+              images: [course.courseThumbnail],
             },
-        };
+            unit_amount: course.coursePrice * 100, // Amount in paise (lowest denomination)
+          },
+          quantity: 1,
+        },
+      ],
+      mode: "payment",
+      success_url: `http://localhost:5173/course-progress/${courseId}`, 
+      cancel_url: `http://localhost:5173/course-detail/${courseId}`,
+      metadata: {
+        courseId: courseId,
+        userId: userId,
+      },
+      shipping_address_collection: {
+        allowed_countries: ["IN"], 
+      },
+    });
 
-        const data = JSON.stringify(payload);
-        const checksum = crypto.createHash("sha256").update(data + PHONEPE_SALT_KEY).digest("hex");
-        const finalXVerify = `${checksum}###${PHONEPE_SALT_INDEX}`;  
-
-        const response = await axios.post(`${PHONEPE_BASE_URL}/pay`, data, {
-            headers: {
-                "Content-Type": "application/json",
-                "X-VERIFY": finalXVerify,
-            },
-        });
-
-        return res.status(200).json({ success: true, data: response.data, transactionId: transaction.transactionId });
-    } catch (error) {
-        return res.status(500).json({ success: false, message: error.message });
+    if (!session.url) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Error while creating session" });
     }
+
+    newPurchase.paymentId = session.id;
+    await newPurchase.save();
+
+    return res.status(200).json({
+      success: true,
+      url: session.url, 
+    });
+  } catch (error) {
+    console.log(error);
+  }
 };
 
-export const paymentCallback = async (req, res) => {
+export const stripeWebhook = async (req, res) => {
+  let event;
+
+  try {
+    const payloadString = JSON.stringify(req.body, null, 2);
+    const secret = process.env.WEBHOOK_ENDPOINT_SECRET;
+
+    const header = stripe.webhooks.generateTestHeaderString({
+      payload: payloadString,
+      secret,
+    });
+
+    event = stripe.webhooks.constructEvent(payloadString, header, secret);
+  } catch (error) {
+    console.error("Webhook error:", error.message);
+    return res.status(400).send(`Webhook error: ${error.message}`);
+  }
+
+  // Handle the checkout session completed event
+  if (event.type === "checkout.session.completed") {
+
     try {
-        const { transactionId, status } = req.body;
+      const session = event.data.object;
 
-        const transaction = await CoursePurchase.findOne({ transactionId });
+      const purchase = await CoursePurchase.findOne({
+        paymentId: session.id,
+      }).populate({ path: "courseId" });
 
-        if (!transaction) {
-            return res.status(404).json({ success: false, message: "Transaction not found" });
-        }
+      if (!purchase) {
+        return res.status(404).json({ message: "Purchase not found" });
+      }
 
-        transaction.status = status;
-        await transaction.save();
+      if (session.amount_total) {
+        purchase.amount = session.amount_total / 100;
+      }
+      purchase.status = "completed";
 
-        if (status === "SUCCESS") {
-            return res.redirect(`${process.env.FRONTEND_URL}/payment-success`);
-        } else {
-            return res.redirect(`${process.env.FRONTEND_URL}/payment-failed`);
-        }
+      // Make all lectures visible by setting `isPreviewFree` to true
+      if (purchase.courseId && purchase.courseId.lectures.length > 0) {
+        await Lecture.updateMany(
+          { _id: { $in: purchase.courseId.lectures } },
+          { $set: { isPreviewFree: true } }
+        );
+      }
+
+      await purchase.save();
+
+      // Update user's enrolledCourses
+      await User.findByIdAndUpdate(
+        purchase.userId,
+        { $addToSet: { enrolledCourses: purchase.courseId._id } }, // Add course ID to enrolledCourses
+        { new: true }
+      );
+
+      // Update course to add user ID to enrolledStudents
+      await Course.findByIdAndUpdate(
+        purchase.courseId._id,
+        { $addToSet: { enrolledStudents: purchase.userId } }, // Add user ID to enrolledStudents
+        { new: true }
+      );
     } catch (error) {
-        return res.status(500).json({ success: false, message: error.message });
+      console.error("Error handling event:", error);
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
+  res.status(200).send();
+};
+
+export const getCourseDetailWithPurchaseStatus = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const userId = req.id;
+
+    const course = await Course.findById(courseId)
+      .populate({ path: "creator" })
+      .populate({ path: "lectures" });
+
+    const purchased = await CoursePurchase.findOne({ userId, courseId });
+
+    if (!course) {
+      return res.status(404).json({ message: "course not found!" });
+    }
+
+    return res.status(200).json({
+      course,
+      purchased: !!purchased, // true if purchased, false otherwise
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getAllPurchasedCourse = async (_, res) => {
+  try {
+    const purchasedCourse = await CoursePurchase.find({
+      status: "completed",
+    }).populate("courseId");
+    if (!purchasedCourse) {
+      return res.status(404).json({
+        purchasedCourse: [],
+      });
+    }
+    return res.status(200).json({
+      purchasedCourse,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const shuriPayment = async (req, res) => {
+    try {
+        const { userId, courseId, amount } = req.body;
+        console.log("Received data:", { userId, courseId, amount });
+
+        const user = await User.findOne({  userId }); 
+        console.log("User Data:", user);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        if (user.shuriCoins < amount) {
+            return res.status(400).json({ message: "Insufficient ShuriCoins" });
+        }
+
+        const transaction = new CoursePurchase({
+            userId:user._id,
+            courseId,
+            amount,
+            paymentId: `TXN_${Date.now()}`,
+            status: "completed",
+        });
+        if(transaction.status === "completed"){
+            return res.status(204).json({message:"Already paid to that course"})
+        }
+
+        console.log("Saving transaction:", transaction);
+        await transaction.save();  
+
+        user.shuriCoins -= amount;
+        await user.save();
+        console.log("Updated User:", user);
+
+        res.status(200).json({ message: "Payment Successful" });
+
+    } catch (error) {
+        console.error("Error in shuriPayment:", error);
+        res.status(500).json({ message: error.message, stack: error.stack });
     }
 };
