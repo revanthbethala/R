@@ -1,5 +1,6 @@
 import { CourseProgress } from "../models/courseProgress.js";
 import { Course } from "../models/course.model.js";
+import User from "../models/user.model.js";
 
 export const getCourseProgress = async (req, res) => {
   try {
@@ -27,6 +28,14 @@ export const getCourseProgress = async (req, res) => {
           completed: false,
         },
       });
+    }
+    if(courseProgress.completed){
+      const user = await User.findOne({ userId });
+          if (!user) {
+            return res.status(404).json({ message: "User not found" });
+          }
+          user.shuriCoins+=5
+
     }
 
     return res.status(200).json({

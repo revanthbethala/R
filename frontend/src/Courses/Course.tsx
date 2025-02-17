@@ -118,8 +118,7 @@ const Course = () => {
           />
         </motion.div>
       </motion.div>
-
-      {/* 🎯 Course Cards Section */}
+      
       {isLoading && <Loading />}
       {error && (
         <p className="text-center text-red-500 font-medium text-lg">
