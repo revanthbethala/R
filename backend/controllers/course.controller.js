@@ -308,3 +308,23 @@ export const getLectureById = async (req, res) => {
       .json({ message: "Error fetching lecture", error: error.message });
   }
 };
+
+export const storeSummary = async(req,res)=>{
+  try{
+    const {summary,transcription} = req.body;
+    const {lectureId} = req.params
+
+    const lecture = await Lecture.findById(lectureId)
+    if(!lecture){
+      return res.status(404).json({message: "Lecture not found"})
+    }
+    lecture.summary = summary
+    lecture.transcription = transcription
+    await lecture.save()
+    res.status(200).json({message: "Summary and transcription updated successfully", lecture})
+  }catch (error) {
+    res
+     .status(500)
+     .json({ message: "Error updating summary and transcription", error: error.message });
+  }
+}

@@ -8,6 +8,8 @@ const lectureSchema = new mongoose.Schema({
   videoUrl: { type: String },
   publicId: { type: String },
   isPreviewFree: { type: Boolean },
+  summary:{ type: String},
+  transcription:{ type: String},
 },{timestamps:true});
 
 export default mongoose.model("Lecture", lectureSchema);

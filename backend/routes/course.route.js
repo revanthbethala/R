@@ -11,6 +11,7 @@ import {
   removeLecture,
   getLectureById,
   getUserCourses,
+  storeSummary,
 } from "../controllers/course.controller.js";
 // import multer from "multer";
 import upload from "../middlewares/multer.js";
@@ -30,6 +31,7 @@ router
   .put(upload.single("file"), editLecture);
 router.route("/:courseId/lecture/:lectureId").delete(removeLecture);
 router.route("/lecture/:lectureId").get(getLectureById);
+router.route("/summary/:lectureId").post(storeSummary)
 
 
 export default router;
