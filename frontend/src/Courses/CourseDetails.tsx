@@ -19,7 +19,7 @@ import {
   Star,
 } from "lucide-react";
 import ReactPlayer from "react-player";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Rating from "react-rating";
 import axios from "axios";
 import { useUser } from "@clerk/clerk-react";
@@ -33,7 +33,6 @@ const CourseDetails = () => {
   const { data: res, isLoading, error } = useGet(`courses/${courseId}`);
   const [userRating, setUserRating] = useState(0);
   const [userReview, setUserReview] = useState("");
-
   if (isLoading) return <Loading />;
   if (error)
     return (
@@ -48,7 +47,20 @@ const CourseDetails = () => {
 
 
 
-  const handleContinueCourse = () => {
+  const handleContinueCourse = async () => {
+    const amount = course?.coursePrice;
+    const res = await axios.post(
+      `http://localhost:8000/api/v1/payments/shuriPay`,
+      JSON.stringify({ userId, courseId, amount }),
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      }
+    );
+    console.log("Form Submitted:", res?.data);
+
     navigate(`../course-progress/${courseId}`);
   };
 
@@ -229,11 +241,9 @@ const CourseDetails = () => {
                   onClick={handleContinueCourse}
                   variant="default"
                 >
-                  Continue Course
+                  Purchase Course
                 </Button>
-                <p className="text-sm text-gray-500 text-center">
-                  30-Day Money-Back Guarantee
-                </p>
+
               </CardContent>
               <CardFooter className="bg-gray-50 p-6">
                 <div className="w-full">

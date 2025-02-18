@@ -120,11 +120,10 @@ export function Quiz({ quizData, timeLimit }) {
             {currentQuestion.options.map((option, index) => (
               <button
                 key={index}
-                className={`w-full py-3 px-4 rounded-lg border-2 ${
-                  selectedAnswer === option
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-100 hover:bg-gray-200"
-                }`}
+                className={`w-full py-3 px-4 rounded-lg border-2 ${selectedAnswer === option
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-100 hover:bg-gray-200"
+                  }`}
                 onClick={() => handleAnswerSelect(option)}
               >
                 {option}
@@ -177,9 +176,8 @@ function ShowResults({ score, totalQuestions }) {
         <div className="font-semibold flex flex-col items-center justify-center py-12 max-w-lg mx-auto">
           <h2 className="text-2xl font-bold text-Inter mb-4">You Scored</h2>
           <h3
-            className={`text-4xl font-bold font-Inter ${
-              percentageObtained > 45 ? "text-blue-600" : "text-red-600"
-            } mb-6`}
+            className={`text-4xl font-bold font-Inter ${percentageObtained > 45 ? "text-blue-600" : "text-red-600"
+              } mb-6`}
           >
             {percentageObtained}%
           </h3>
