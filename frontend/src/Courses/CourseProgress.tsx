@@ -114,11 +114,10 @@ const CourseProgress = () => {
               </div>
               <div className="bg-white p-4 rounded-lg shadow">
                 <h3 className="font-semibold text-xl mb-2">
-                  {`Lecture ${
-                    (courseData?.lectures?.findIndex(
-                      (lec) => lec._id === currentLecture._id
-                    ) ?? -1) + 1
-                  } : ${currentLecture.lectureTitle}`}
+                  {`Lecture ${(courseData?.lectures?.findIndex(
+                    (lec) => lec._id === currentLecture._id
+                  ) ?? -1) + 1
+                    } : ${currentLecture.lectureTitle}`}
                 </h3>
                 <br />
                 <Button onClick={handleSummarize}>
@@ -158,9 +157,8 @@ const CourseProgress = () => {
             {courseData?.lectures?.map((lecture, index) => (
               <Card
                 key={lecture._id}
-                className={`hover:bg-gray-50 transition-colors cursor-pointer ${
-                  lecture._id === currentLecture?._id ? "border-primary" : ""
-                }`}
+                className={`hover:bg-gray-50 transition-colors cursor-pointer ${lecture._id === currentLecture?._id ? "border-primary" : ""
+                  }`}
                 onClick={() => handleSelectLecture(lecture)}
               >
                 <CardContent className="flex items-center p-4">

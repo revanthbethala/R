@@ -18,25 +18,6 @@ import axios from "axios";
 function Categories() {
   const { user, isLoaded } = useUser();
   const [userCoins, setUserCoins] = useState(0);
-  const syncUserData = async () => {
-    if (user) {
-      try {
-        const userData = {
-          userId: user.id,
-          fullName: user.username,
-          email: user.primaryEmailAddress?.emailAddress,
-          profilePic: user.imageUrl,
-          isSignedIn: true,
-        };
-        await axios.post(
-          "http://localhost:8000/api/v1/user/getDetails",
-          userData
-        );
-      } catch (error) {
-        console.error("Error syncing user data:", error);
-      }
-    }
-  };
 
   const fetchUserCoins = async (userId: any) => {
     try {
@@ -50,12 +31,29 @@ function Categories() {
     }
   };
 
-  useEffect(() => {
-    if (isLoaded && user) {
-      syncUserData();
-      fetchUserCoins(user.id).then((coins: any) => setUserCoins(coins));
-    }
-  }, [isLoaded, user]);
+  if (isLoaded && user) {
+    const syncUserData = async () => {
+      if (user) {
+        try {
+          const userData = {
+            userId: user.id,
+            fullName: user.username,
+            email: user.primaryEmailAddress?.emailAddress,
+            profilePic: user.imageUrl,
+            isSignedIn: true,
+          };
+          await axios.post(
+            "http://localhost:8000/api/v1/user/getDetails",
+            userData
+          );
+        } catch (error) {
+          console.error("Error syncing user data:", error);
+        }
+      }
+    };
+    syncUserData();
+    fetchUserCoins(user.id).then((coins) => setUserCoins(coins));
+  }
   return (
     <div className=" w-full my-bg">
       <div className="flex items-center gap-2 bg-white p-2 rounded-lg shadow-sm border border-gray-200">

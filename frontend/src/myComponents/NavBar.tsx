@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router";
-import { CircleDollarSign, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import Logo from "./Logo";
 import { UserButton, useUser } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
-import useGet from "./useGet";
 function NavBar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
   const { isSignedIn } = useUser();
@@ -14,9 +13,7 @@ function NavBar() {
     localStorage.getItem("role")
   );
   const { user } = useUser();
-  console.log("User,user");
   const userId = user?.id;
-  console.log("userId: " + userId);
   const instructorFirstVisit = localStorage.getItem("instructorFirstVisit");
 
 
@@ -78,7 +75,7 @@ function NavBar() {
           <div className="hidden md:flex md:  space-x-4 ">
 
             <div className="md:flex gap-4">
-              {isSignedIn && <NavLink
+              {/* {isSignedIn && <NavLink
                 to={
                   selectedRole === "instructor"
                     ? `/instructor/dashboard`
@@ -90,7 +87,7 @@ function NavBar() {
                 <Button className="px-4 py-2 rounded-md text-white bg-blue-500 hover:bg-blue-600">
                   My Dashboard
                 </Button>
-              </NavLink>}
+              </NavLink>} */}
               {!isSignedIn && (
                 <Button onClick={() => navigate("/signup")} className="bg-blue-700 font-semibold font-Inter tracking-wide hover:bg-blue-800">
                   Login/Sign Up
