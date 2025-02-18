@@ -38,7 +38,7 @@ function Categories() {
     }
   };
 
-  const fetchUserCoins = async (userId:any) => {
+  const fetchUserCoins = async (userId: any) => {
     try {
       const response = await axios.get(`http://localhost:8000/api/v1/user/getUserByClerk/${userId}`);
       console.log(response);
@@ -46,22 +46,22 @@ function Categories() {
       return response.data.user.shuriCoins;
     } catch (error) {
       console.error("Error fetching user coins:", error);
-      return 0; 
+      return 0;
     }
   };
 
   useEffect(() => {
     if (isLoaded && user) {
       syncUserData();
-      fetchUserCoins(user.id).then((coins:any) => setUserCoins(coins));
+      fetchUserCoins(user.id).then((coins: any) => setUserCoins(coins));
     }
   }, [isLoaded, user]);
   return (
     <div className=" w-full my-bg">
       <div className="flex items-center gap-2 bg-white p-2 rounded-lg shadow-sm border border-gray-200">
-              <CircleDollarSign size={20} className="text-yellow-500" />
-              <span className="text-lg font-bold text-gray-800">{userCoins}</span>
-            </div>
+        <CircleDollarSign size={20} className="text-yellow-500" />
+        <span className="text-lg font-bold text-gray-800">{userCoins}</span>
+      </div>
       {/* Hero Section */}
       <div className="flex md:flex-row flex-col-reverse md:px-20 items-center h-[calc(100vh-5rem)] justify-between px-2">
         <div className="space-y-4 p-4 flex flex-col  md:items-start font-Inter md:w-1/2">
@@ -87,7 +87,7 @@ function Categories() {
         </div>
       </div>
 
-      
+
 
       {/* Categories Section */}
       <div className="flex flex-col py-10 px-4">

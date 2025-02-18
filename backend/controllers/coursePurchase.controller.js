@@ -1,8 +1,8 @@
 import Stripe from "stripe";
-import  Course  from "../models/course.model.js";
-import  CoursePurchase  from "../models/coursePurchase.model.js";
+import Course from "../models/course.model.js";
+import CoursePurchase from "../models/coursePurchase.model.js";
 import Lecture from "../models/lecture.model.js";
-import  User  from "../models/user.model.js";
+import User from "../models/user.model.js";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -37,14 +37,14 @@ export const createCheckoutSession = async (req, res) => {
         },
       ],
       mode: "payment",
-      success_url: `http://localhost:5173/course-progress/${courseId}`, 
+      success_url: `http://localhost:5173/course-progress/${courseId}`,
       cancel_url: `http://localhost:5173/course-detail/${courseId}`,
       metadata: {
         courseId: courseId,
         userId: userId,
       },
       shipping_address_collection: {
-        allowed_countries: ["IN"], 
+        allowed_countries: ["IN"],
       },
     });
 
@@ -59,7 +59,7 @@ export const createCheckoutSession = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      url: session.url, 
+      url: session.url,
     });
   } catch (error) {
     console.log(error);
@@ -177,43 +177,43 @@ export const getAllPurchasedCourse = async (_, res) => {
 };
 
 export const shuriPayment = async (req, res) => {
-    try {
-        const { userId, courseId, amount } = req.body;
-        console.log("Received data:", { userId, courseId, amount });
+  try {
+    const { userId, courseId, amount } = req.body;
+    console.log("Received data:", { userId, courseId, amount });
 
-        const user = await User.findOne({  userId }); 
-        console.log("User Data:", user);
+    const user = await User.findOne({ userId });
+    console.log("User Data:", user);
 
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-
-        if (user.shuriCoins < amount) {
-            return res.status(400).json({ message: "Insufficient ShuriCoins" });
-        }
-
-        const transaction = new CoursePurchase({
-            userId:user._id,
-            courseId,
-            amount,
-            paymentId: `TXN_${Date.now()}`,
-            status: "completed",
-        });
-        if(transaction.status === "completed"){
-            return res.status(204).json({message:"Already paid to that course"})
-        }
-
-        console.log("Saving transaction:", transaction);
-        await transaction.save();  
-
-        user.shuriCoins -= amount;
-        await user.save();
-        console.log("Updated User:", user);
-
-        res.status(200).json({ message: "Payment Successful" });
-
-    } catch (error) {
-        console.error("Error in shuriPayment:", error);
-        res.status(500).json({ message: error.message, stack: error.stack });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
+
+    if (user.shuriCoins < amount) {
+      return res.status(400).json({ message: "Insufficient ShuriCoins" });
+    }
+
+    const transaction = new CoursePurchase({
+      userId: user._id,
+      courseId,
+      amount,
+      paymentId: `TXN_${Date.now()}`,
+      status: "completed",
+    });
+    if (transaction.status === "completed") {
+      return res.status(204).json({ message: "Already paid to that course" })
+    }
+
+    console.log("Saving transaction:", transaction);
+    await transaction.save();
+
+    user.shuriCoins -= amount;
+    await user.save();
+    console.log("Updated User:", user);
+
+    res.status(200).json({ message: "Payment Successful" });
+
+  } catch (error) {
+    console.error("Error in shuriPayment:", error);
+    res.status(500).json({ message: error.message, stack: error.stack });
+  }
 };

@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router";
-import { Menu, X } from "lucide-react";
+import { CircleDollarSign, Menu, X } from "lucide-react";
 import Logo from "./Logo";
 import { UserButton, useUser } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
+import useGet from "./useGet";
 function NavBar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
   const { isSignedIn } = useUser();
@@ -13,8 +14,12 @@ function NavBar() {
     localStorage.getItem("role")
   );
   const { user } = useUser();
+  console.log("User,user");
   const userId = user?.id;
+  console.log("userId: " + userId);
   const instructorFirstVisit = localStorage.getItem("instructorFirstVisit");
+
+
   const handleRoleChange = async (event) => {
     const role: string = event.target.value;
     setSelectedRole(role);
@@ -36,6 +41,7 @@ function NavBar() {
     );
     console.log(req);
   };
+
   return (
     <div className="">
       <header className="items-center">
@@ -70,6 +76,7 @@ function NavBar() {
 
           {/* Sign Up/Sign In Buttons */}
           <div className="hidden md:flex md:  space-x-4 ">
+
             <div className="md:flex gap-4">
               {isSignedIn && <NavLink
                 to={
@@ -152,8 +159,8 @@ function NavBar() {
                   isSignedIn ? navigate("/dashboard") : navigate("/signup")
                 }
                 className={`${isSignedIn
-                    ? "font-semibold text-lg font-Inter cursor-pointer  p-2"
-                    : "bg-blue-700 text-white   font-semibold px-4 py-2  w-fit text-lg rounded-lg"
+                  ? "font-semibold text-lg font-Inter cursor-pointer  p-2"
+                  : "bg-blue-700 text-white   font-semibold px-4 py-2  w-fit text-lg rounded-lg"
                   }  font-family-poppins `}
               >
                 {isSignedIn ? "Dashboard" : "Login/Sign Up"}
